@@ -166,11 +166,31 @@ Terra (비공개) ─────────┘      ← Terra 는 terra-sdk ·
 ## 7. 확인하지 못한 것
 
 - `terra-protocol` 3파일이 같은 패키지의 다른 파일 식별자를 참조하는지(정의 위치 검색까지만 했고 컴파일로 검증하지 않음).
+  - **해소(terra-sdk S-6, 2026-10-09)**: 3파일과 테스트를 단독 패키지로 복사해 `go build`·`go vet`·`go test`가 통과했다. 다른 파일의 식별자를 참조하지 않는다.
 - `CatalogOperation` 딸린 타입의 연쇄.
 - T-1 별칭 전환이 코어 전체를 깨지 않는지(이론상 안전, 빌드 미확인).
 - `agent` 모듈이 `agentcore` 27개 심볼 중 실제로 호출하는 경로가 CLI와 겹치는지.
 - `bundled-modules.json`의 위치와 번들 구성이 모듈 경로 개명에 영향받는지.
 - 로컬 Terra `main`은 `origin/main`보다 423커밋 뒤처져 있었다. **작업 전 `git fetch`하고 `origin/main`에서 새 브랜치를 딴다.**
+
+
+### 7.1 terra-sdk 이전 중 새로 확인한 것 (S-1~S-8, Terra `origin/main` b2a76a6 기준)
+
+해소된 항목은 위 목록의 `terra-protocol` 3파일 하나다. 나머지 §7 항목(`CatalogOperation` 연쇄, T-1 별칭 전환, `agent` 모듈 호출 경로, `bundled-modules.json`, 로컬 `main` 뒤처짐)은 terra-sdk에서 확인할 수 없는 것이라 그대로 남는다.
+
+새로 생긴 항목:
+
+| ID | 내용 | 영향·후속 |
+| --- | --- | --- |
+| N-1 | **연쇄**: `handshake.go`의 `Activate`·`NextActivationState`(호스트 쪽 활성화 보조)가 `lifecycle.go`의 `State`와 `manifest.go`의 `Readiness`를 끌고 왔다. `lifecycle.go` 전체(61줄, 상태 9개와 전이표)와 `Readiness` 구조체(11줄)를 가져왔다. 둘 다 stdlib만 쓰고 더 이상 연쇄하지 않는다 | 이동 규칙(동작 불변)을 지키려 `Activate`를 SDK에 두었다. 이것은 "모듈이 쓰는 약속"이 아니라 호스트 로직이라 SDK가 얇다는 원칙과 약간 어긋난다. 제거할지(Terra에 두고 SDK 테스트는 키트로 대체)는 사용자 결정. 제거하면 `lifecycle.go`·`readiness.go`도 같이 빠진다 |
+| N-2 | **부분 가져오기**: 한 파일의 일부만 가져왔다 — `hostadapter.go`(`CoreInvocation`·`CoreResult`만), `svi_sink.go`(`ManifestProvidesSVISink`·`contributionsSVISinkKey` 제외), `capability_broker.go`(`ErrCoreOperationDenied`만), `state_store.go`(`DataDirName`·`ModuleDataDir`만), `config_store.go`(`ConfigFileEnv`만), `shared_roots.go`(`DeclaresSharedRoots`·`declaresStorage` 제외). 제외한 것은 모두 `Manifest`에 의존한다 | T-1에서 Terra의 `modulert`는 이전된 타입·상수만 별칭으로 바꾸고 나머지(위 제외분, `HostAdapter`, 브로커, 상태 저장소 등)는 그대로 가진다. 상수는 `type`이 아니라 `const X = sdk.X`로 다시 내보내야 한다 |
+| N-3 | **패키지 배치**: 단일 Go 모듈(P-2) 안에 원본 패키지명을 그대로 둔 하위 패키지 4개 — `modulesdk`·`modulert`·`svi`·`protocol`. 원본이 쓰던 import 별칭(`modulert`·`coresvi`)이 그대로 맞는다 | 설계 문서가 정하지 않은 부분이라 내가 고른 배치다. `protocol`·`svi`는 Terra 쪽 같은 이름 패키지의 부분집합이므로 Terra에서 별칭 전환 시 import 이름이 겹치지 않게 `sdkprotocol` 같은 별칭을 써야 한다 |
+| N-4 | **줄 수**: §3 표의 "약 1,550줄"보다 크다. 테스트 제외 비어 있지 않은 Go 코드가 약 1,770줄(`doc.go` 3개 추가분 약 20줄 포함) | N-1(`lifecycle.go`·`readiness.go` 약 70줄)과 주석이 많은 `modulert` 파일들이 차이를 만든다 |
+| N-5 | **문서와 코드 불일치**: 계약 문서 머리말은 Python 예시를 "63줄"이라 적었지만 현재 파일은 71줄이다(본 문서 §3은 71줄로 맞다) | 원본은 Terra 문서라 고치지 않았다. 사본 머리에 사실을 적었다 |
+| N-6 | **S-7 범위**: 원본 시험은 Terra의 `Activate`와 `repoRoot`에 의존해 그대로는 못 옮긴다. 계약 리터럴 + raw HTTP로 다시 썼고, 원본 묶음의 나머지(Gateway·daemon·scaffold 연동)는 Terra 코드가 필요해 가져오지 않았다 | 키트는 선택 경로(`/terra/svi/*`, `/terra/core/invoke`)를 아직 검사하지 않는다 |
+| N-7 | **와이어 계약에 버전 표지가 없다**: 환경변수·핸드셰이크 응답 어디에도 계약 버전이 없다 | 버전 정책 초안([[docs/policy/versioning]] §6)이 이를 미결정으로 남겼다. §8의 `compatibility` 필드와 같은 결이라 1단계 범위 밖이다 |
+| N-8 | **작업 방식**: 세션이 지정한 브랜치 `claude/optimistic-gauss-o0b0ku` 하나에서 S-1~S-8을 커밋 단위로 나눠 한 PR로 올렸다. S-2는 S-3~S-5에 컴파일 의존이라 S-3 뒤에 커밋했다(S-1 이후 각 커밋은 단독으로 `go build`·`go vet`·`go test`가 통과한다. S-1 커밋만 Go 패키지가 없어 `go vet ./...`가 "no packages to vet"으로 실패한다) | 지시문의 예시 브랜치명(`feat/s2-host-core`) 대신 세션 지정 브랜치를 썼다 |
+| N-9 | **검증한 것**: Go 1.23.0 툴체인(`go.mod`의 최저 버전)과 1.25.0에서 `go build`·`go vet`·`go test -count=1 ./...` 통과. 외부 의존 0(`go.mod`에 `require` 없음) | Windows·macOS는 CI 매트릭스로만 확인한다 |
 
 ## 8. 하지 않는 일 (1단계 범위 밖)
 

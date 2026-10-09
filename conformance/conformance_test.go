@@ -34,7 +34,7 @@ func python(t *testing.T) string {
 func TestDocumentedPythonExamplePasses(t *testing.T) {
 	conformancetest.Run(t, conformance.Spec{
 		Command:       python(t),
-		Args:          []string{"testdata/module-host-minimal.py"},
+		Args:          []string{"../docs/contracts/examples/module-host-minimal.py"},
 		ModuleID:      sampleID,
 		OperationPath: "/api/modules/" + sampleID + "/v1/status",
 	})
