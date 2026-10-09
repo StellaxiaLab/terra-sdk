@@ -9,6 +9,7 @@ import (
 	"os/exec"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/StellaxiaLab/terra-sdk/conformance"
 	"github.com/StellaxiaLab/terra-sdk/conformance/conformancetest"
@@ -37,6 +38,11 @@ func TestDocumentedPythonExamplePasses(t *testing.T) {
 		Args:          []string{"../docs/contracts/examples/module-host-minimal.py"},
 		ModuleID:      sampleID,
 		OperationPath: "/api/modules/" + sampleID + "/v1/status",
+		// http.server.HTTPServer calls socket.getfqdn() between bind and listen,
+		// and that reverse lookup can take tens of seconds on macOS CI runners.
+		// The example is kept byte-identical to the documented one, so the
+		// allowance goes here instead of into the example.
+		BindTimeout: 90 * time.Second,
 	})
 }
 

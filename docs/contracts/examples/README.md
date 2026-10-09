@@ -39,3 +39,9 @@ go run ./cmd/terra-conformance \
 
 모든 줄이 `PASS`이고 종료 코드가 0이면 이 예제는 계약을 지킨다. 자기 모듈을 검사하려면 `--` 뒤의 명령만 바꾼다.
 Windows에서는 `python3` 대신 `python`을 쓴다.
+
+## 알려진 주의
+
+이 예제는 `http.server.HTTPServer`를 쓰는데, 이 클래스는 bind와 listen 사이에 `socket.getfqdn()`을 부른다.
+역방향 조회가 느린 환경(macOS CI 러너에서 20초를 넘긴 적이 있다고 의심한다 — 원인은 아직 확정하지 않았다)에서는
+listen이 그만큼 늦어져 키트의 `-bind-timeout`(기본 20초)에 걸릴 수 있다. 그럴 때는 `-bind-timeout 90s`처럼 늘린다.
