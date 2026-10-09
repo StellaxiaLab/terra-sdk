@@ -1,0 +1,25 @@
+name: release
+
+# Go 모듈은 태그 자체가 릴리스다. 이 워크플로는 v* 태그가 올라오면
+# 같은 검증을 다시 돌리고 통과하면 GitHub Release 노트를 만든다.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - run: go vet ./...
+      - run: go test -count=1 ./...
+      - name: create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" --generate-notes --verify-tag
