@@ -32,16 +32,22 @@ v0.1.0 준비 시점(`go doc` 기준 내보낸 식별자)의 목록이다. 시�
 - 그 밖의 상수: `LoopbackHost`, `DataDirName`, `SharedRootsPermission`, `SVISinkOpOpen`, `SVISinkOpWrite`, `SVISinkOpClose`, `State*` 9개(`StateDiscovered` … `StateStopped`)
 - 오류: `ErrCoreOperationDenied`
 
-## `svi` — SVI 데이터 타입 (17개 타입과 상수)
+## `svi` — SVI 데이터 타입과 서술자 검증
 
 - 타입: `ResourceDescriptor`, `EndpointDescriptor`, `EndpointReference`, `RuntimeStatus`, `HandleRequest`, `SubjectRef`, `BindingDeclaration`, `BindingDesiredState`, `CompatibilityPolicy`, `Direction`, `Interaction`, `Operation`, `QoSProfile`, `ResourceStatus`, `RuntimeKind`, `RuntimeState`, `SubjectType`
 - 상수 55개: 위 열거형의 값(`Direction*`, `Interaction*`, `Operation*`, `QoS*`, `Resource*`, `Runtime*`, `Subject*`, `CompatibilityPolicy*`, `BindingDesired*`)
+- 검증(v0.2.0에서 추가): `ValidateResource`, `ValidateEndpoint`, `ParseSchemaRef`, 타입 `SchemaRef`, 오류 `ErrInvalidResource`, `ErrInvalidEndpoint`, `ErrInvalidSchemaRef`
 
 ## `protocol` — 입력 타입
 
 - 타입: `InputPermissionTier`, `KeyEvent`, `PointerButton`, `PointerEvent`, `PointerPosition`
 - 함수/메서드: `InputTierForKind`, `IsTerraVirtualInput`, `NormalizePixels`, `PointerPosition.ToPixels`
 - 상수: `InputTierKeyboard`, `InputTierObserve`, `InputTierPointer`, `InputTierRaw`, `PointerButtonLeft`, `PointerButtonMiddle`, `PointerButtonRight`, `PointerPositionMax`, `VirtualInputBus`, `VirtualInputProduct`, `VirtualInputVendor`
+
+## `testwait` — 테스트용 대기 도우미 (v0.2.0에서 추가)
+
+- 함수: `Until`, `UntilFor`, `Became`, `BecameWithin`, `Budget`, `Scale`, `Context`, `ContextFor`
+- 상수: `DefaultBudget`, `PollInterval`, `ScaleEnvVar`
 
 ## `conformance`, `conformance/conformancetest`, `cmd/terra-conformance` — 적합성 키트
 

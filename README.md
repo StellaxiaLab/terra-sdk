@@ -23,8 +23,9 @@ Terra 모듈이 호스트와 대화하는 약속을 구현한 얇은 공개 Go S
 | --- | --- |
 | `github.com/StellaxiaLab/terra-sdk/modulesdk` | 모듈이 호스트에 붙는 도우미: `Listen/Serve`, `FromEnv`, `CoreClient`, `ModuleConfig`, `DataDir`, SVI sink |
 | `github.com/StellaxiaLab/terra-sdk/modulert` | 호스트↔모듈 와이어 계약: 환경변수 이름, 경로, 헤더, 신원·핸드셰이크·코어 호출 DTO, 위임 도어, 공유 루트 |
-| `github.com/StellaxiaLab/terra-sdk/svi` | SVI 데이터 타입 |
+| `github.com/StellaxiaLab/terra-sdk/svi` | SVI 데이터 타입과 서술자 검증(`ValidateResource` 등) |
 | `github.com/StellaxiaLab/terra-sdk/protocol` | 입력 이벤트·권한·가상 입력 타입 |
+| `github.com/StellaxiaLab/terra-sdk/testwait` | 테스트용 대기 도우미(`Until` 등, 예산은 `TERRA_TEST_WAIT_SCALE`로 조절) |
 | `github.com/StellaxiaLab/terra-sdk/conformance` | 적합성 테스트 키트 (`terra-conformance` 명령 포함) |
 
 Go가 아닌 모듈도 [계약 문서](docs/contracts/module-host-http-contract.md)와 [Python 예제](docs/contracts/examples/README.md)만으로 만들 수 있고,

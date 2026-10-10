@@ -1,0 +1,7 @@
+{
+  "endpoint_id": "stdout",
+  "direction": "source",
+  "interaction": "stream",
+  "operations": ["subscribe"],
+  "status": "available"
+}
