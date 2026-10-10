@@ -46,6 +46,10 @@ related:
 | S-4 | `terra-module-runtime/gateway_delegate.go` | `modulert/gateway_delegate.go` | 전체 |
 | S-4 | `terra-module-runtime/shared_roots.go` | `modulert/shared_roots.go` | `DeclaresSharedRoots`·`declaresStorage`(Manifest 의존) 제외 |
 | S-5 | `terra-svi/types.go` | `svi/types.go` | 전체 |
+| 후속(io-inventory) | `terra-svi/validation.go` | `svi/validate.go` | `ValidateResource`와 호출 연쇄(`ValidateEndpoint` · 값 검증 함수 · `validateUniqueStrings` · `blank`)와 오류 3개(`ErrInvalidResource` · `ErrInvalidEndpoint` · `ErrInvalidSchemaRef`) · `kindPattern`. 함수 본문은 원본과 동일. `ValidateHandleRequest` · `ValidateBinding` · `ValidateRuntimeStatus`는 호스트 쪽이라 제외 |
+| 후속(io-inventory) | `terra-svi/schema_ref.go` (+`_test`) | `svi/schema_ref.go` | 전체 |
+| 후속(io-inventory) | `terra-svi/validation_test.go`의 서술자 검증 4개, `terra-svi/fixtures/{valid,invalid}/…` 3개 | `svi/validate_test.go`, `svi/testdata/` | 시험 4개와 고정 입력 3개. 고정 입력 경로만 `fixtures` → `testdata` |
+| 후속(io-weave) | `terra-testwait/testwait.go` (+`_test`) | `testwait/` | 코드 본문 동일, 패키지 설명 주석만 이 레포용으로 다시 씀. 저장소 전체를 훑는 `guard_test.go`는 Terra 전용이라 제외 |
 | S-6 | `terra-protocol/{inputevent,inputpermission,virtualinput}.go` (+`_test` 3개) | `protocol/` | 전체 |
 | S-7 | `tests/module-gateway-integration/module_contract_doc_test.go` | `conformance/` | 계약 검증 부분을 새로 작성(복사 아님). 아래 참조 |
 | S-8 | `docs/contracts/module-host-http-contract.md` | `docs/contracts/` | 본문 무변경, 머리에 사본 안내만 추가 |
@@ -57,6 +61,14 @@ related:
 - 부분 가져온 파일의 머리에 "Subset of …" 주석 추가, 제외한 선언 삭제
 - 패키지 설명용 `doc.go` 추가 (`modulert` · `svi` · `protocol`)
 - 파일 안의 주석은 손대지 않았다. 그래서 Terra 내부 설계 절 번호(§12.1 등)와 한국어 주석이 남아 있다.
+
+## 후속 추가 (v0.2.0)
+
+`io-inventory`의 시험이 `svi.ValidateResource`를, `io-weave`의 시험이 `testwait`의 `Budget`을 부른다. 둘 다 사용자 결정(2026-10-10)으로 SDK에 공개했다.
+설계 문서 §3은 `terra-svi`의 "검증"을 공개하지 않는 것으로 적었다. 이 추가는 그 문장의 일부(서술자 검증)를 바꾼 결정이다.
+
+**Terra에 같은 코드가 둘이 된다.** Terra의 `terra-svi`는 타입을 SDK 별칭으로 바꿨지만(T-1) `ValidateResource`는 자기 사본을 갖고 있다. 오류 변수도 별개라
+`errors.Is(err, sdksvi.ErrInvalidResource)`는 Terra의 오류에 거짓이다. 설계 D-3("원본은 공개 SDK 한 곳")대로 하려면 Terra 쪽이 SDK 것을 부르게 바꿔야 한다(Terra 후속 작업).
 
 ## S-7은 복사가 아니다
 

@@ -1,0 +1,31 @@
+{
+  "resource_id": "svires_1720782000000_0011223344556677",
+  "node_id": "node_1720781000000_aabbccddeeff0011",
+  "kind": "process",
+  "canonical_name": "process/demo",
+  "display_name": "Demo Process",
+  "provider_id": "adapter.process.test",
+  "owner": {
+    "type": "user",
+    "id": "user_1720780000000_1234567890abcdef"
+  },
+  "labels": {
+    "environment": "test"
+  },
+  "generation": 1,
+  "revision": 1,
+  "status": "available",
+  "expires_at": "2026-07-12T18:00:00+09:00",
+  "endpoints": [
+    {
+      "endpoint_id": "stdout",
+      "direction": "source",
+      "interaction": "stream",
+      "operations": ["subscribe", "bind.source"],
+      "output_schema": "terra.bytes@1",
+      "encodings": ["raw"],
+      "qos_profiles": ["reliable_ordered"],
+      "status": "available"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "endpoint_id": "stdout",
+  "direction": "source",
+  "interaction": "stream",
+  "operations": ["subscribe", "bind.source"],
+  "output_schema": "terra.bytes@1",
+  "encodings": ["raw"],
+  "qos_profiles": ["reliable_ordered"],
+  "exclusive": false,
+  "max_consumers": 4,
+  "status": "available"
+}
