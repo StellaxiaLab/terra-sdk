@@ -42,4 +42,4 @@ CI(GitHub Actions)는 `go build`, `go vet`, `go test -count=1 ./...`를 Linux·W
 
 ## 라이선스
 
-아직 지정하지 않았다. 레포 소유자가 정한다.
+[Apache License 2.0](LICENSE). 외부 모듈 개발자가 자유롭게 링크하고 배포할 수 있게 하려는 것이 이 SDK의 목적이다. 특허 사용권이 명시되어 있고, 상표(“Terra” 등의 이름)는 이 라이선스가 허락하는 범위 밖이다.
