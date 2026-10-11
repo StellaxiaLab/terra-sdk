@@ -4,11 +4,56 @@ doc_type: "design"
 scope: "project"
 target: "terra-sdk"
 status: "active"
-version: "v1.0"
-last_updated: "2026-10-09"
+version: "v1.1"
+last_updated: "2026-10-11"
 ---
 
 # 모듈 독립 레포 전환 — 설계와 작업 분담
+
+## 진행 현황 (2026-10-11)
+
+> 아래는 2026-10-11에 각 레포 `origin/main`과 PR 상태를 `gh`로 다시 확인한 결과다. 본문(§1~§8)의 결정·표·작업 목록은 이력이라 고치지 않았다. 본문과 어긋나는 곳은 §7에 정정 한 줄로 달았다.
+> 상태 기호: ✅ 병합 · ⏳ 진행 중. M-7은 해당 없음(이관하지 않기로 결정).
+
+### 작업별 상태
+
+| ID | 상태 | 근거 |
+| --- | --- | --- |
+| S-1~S-8 | ✅ | terra-sdk [#1](https://github.com/StellaxiaLab/terra-sdk/pull/1), 태그 `v0.1.0`. 이후 [#2](https://github.com/StellaxiaLab/terra-sdk/pull/2)(§7 갱신), [#3](https://github.com/StellaxiaLab/terra-sdk/pull/3)(svi 서술자 검증·testwait 공개, v0.2.0 후보)도 병합됐으나 `v0.2.0` 태그는 아직 없다 |
+| A-1~A-4 | ✅ | terra-agent [#1](https://github.com/StellaxiaLab/terra-agent/pull/1), 태그 `v0.1.0` |
+| M-1 | ✅ | modules [#56](https://github.com/StellaxiaLab/modules/pull/56) |
+| M-2 | ✅ | modules [#65](https://github.com/StellaxiaLab/modules/pull/65)·[#66](https://github.com/StellaxiaLab/modules/pull/66)·[#67](https://github.com/StellaxiaLab/modules/pull/67). Go 모듈 10개 전부 `terra-sdk`를 require한다. `go.work`는 없고, 남은 `replace`는 modules 안의 `internal/testkit`뿐이다(Terra 경로 0). 먼저 낸 [#60](https://github.com/StellaxiaLab/modules/pull/60)은 겹쳐서 닫았다 |
+| M-3 | ✅ | modules [#59](https://github.com/StellaxiaLab/modules/pull/59)·[#64](https://github.com/StellaxiaLab/modules/pull/64). [#61](https://github.com/StellaxiaLab/modules/pull/61)은 닫음 |
+| M-4 | ✅ | modules [#57](https://github.com/StellaxiaLab/modules/pull/57) |
+| M-5·M-6 | ✅ | modules [#68](https://github.com/StellaxiaLab/modules/pull/68)(앞선 [#62](https://github.com/StellaxiaLab/modules/pull/62)를 main 기준으로 다시 만든 것). 단, 검사 다섯 개를 Terra CI로 넘겼고 그 잡은 아직 없다(아래 설계 변경 3) |
+| M-7 | 해당 없음 | **결정(2026-10-11, 사용자 승인): 이관하지 않음 — 예제는 Terra에 남는다.** 사유는 아래 설계 변경 4 |
+| M-8 | ✅ | modules [#56](https://github.com/StellaxiaLab/modules/pull/56)(초안 포함). 독립 빌드 절에 이 문서 링크를 거는 [#71](https://github.com/StellaxiaLab/modules/pull/71)은 열려 있다 |
+| T-1 | ✅ | Terra [#158](https://github.com/StellaxiaLab/Terra/pull/158). 대체된 [#157](https://github.com/StellaxiaLab/Terra/pull/157)은 닫음 |
+| T-2 | ✅ | T-2a [#168](https://github.com/StellaxiaLab/Terra/pull/168), T-2b [#178](https://github.com/StellaxiaLab/Terra/pull/178). shim 방식 [#167](https://github.com/StellaxiaLab/Terra/pull/167)·[#172](https://github.com/StellaxiaLab/Terra/pull/172)는 소비자가 없어져 필요 없어 닫음 |
+| T-3 | ✅ | Terra [#155](https://github.com/StellaxiaLab/Terra/pull/155)·[#163](https://github.com/StellaxiaLab/Terra/pull/163)·[#159](https://github.com/StellaxiaLab/Terra/pull/159) |
+| T-4 | ✅ | Terra [#160](https://github.com/StellaxiaLab/Terra/pull/160). 대체된 [#161](https://github.com/StellaxiaLab/Terra/pull/161)은 닫음 |
+| T-5 | ✅ (일부 증거만) | `go.work`에서 삭제된 패키지 등재를 지운 것은 #178에 들어 있고 현재 `go.work`는 삭제된 세 패키지를 가리키지 않는다. `Test-ProductSourceLayout.ps1` 등 경로를 가정하는 도구를 따로 점검한 PR은 찾지 못했다 |
+| T-6 | ✅ | 문서 갱신 완료([#162](https://github.com/StellaxiaLab/Terra/pull/162)). `examples/scene-login-demo` 예제 이관은 하지 않음(M-7 결정) |
+| (Terra 후속) | ⏳ | [#173](https://github.com/StellaxiaLab/Terra/pull/173) 호스트 판정 검증을 `module-gateway-integration`으로 이전 — 열림, CI 대기. [#177](https://github.com/StellaxiaLab/Terra/pull/177)은 `main`의 214fff87이 같은 수정이라 중복으로 닫음 |
+
+Terra의 내부 `terra-module-sdk`·`terra-agent-core`·`terra-io-weave` 패키지는 모두 삭제됐고 `go.work`에도 없다.
+
+### 설계 변경 (본문에 없던 것 · 정정)
+
+1. **`terra-io-weave`의 "코어 사용처 0" (정정의 정정).** §1 마지막 행의 "코어 사용처가 없으므로"는 **비테스트 코드 기준으로는 맞았다.** Terra의 `module-gateway-integration/io_weave_e2e_test.go`에는 그 패키지를 import하는 줄이 없고 모듈 바이너리 파일명 문자열 `"terra-io-weave"`와 모듈 id뿐이다. 앞서 이 점을 사용처로 잘못 정정한 적이 있어 다시 바로잡는다. T-4([#160](https://github.com/StellaxiaLab/Terra/pull/160))는 이 판단대로 패키지를 지웠다.
+2. **`terra module new` 스캐폴드가 공개 `terra-sdk` v0.1.0을 require하고 `go.sum`을 굽는다** ([Terra#168](https://github.com/StellaxiaLab/Terra/pull/168)). 이 항목은 설계 문서에 원래 없었다. 폐쇄망 빌드 절차는 Terra `docs/guides/first-module-tutorial.md` §1-1에 있다.
+3. **modules CI에서 다섯 검사를 뺐다** ([modules#68](https://github.com/StellaxiaLab/modules/pull/68)): `terra module pack`(Scene 무결성), 출하 Scene의 실 런타임 마운트(G-23), 스키마 사본 ↔ Terra 원본 바이트 대조, Terra Master 계약 ↔ treebench 생성물, Terra 계약 ↔ node-gui Master 위임 표. 권위는 Terra CI로 넘어갔다. **그 Terra CI 잡은 2026-10-11 현재 원격에 PR도 브랜치(`ci/modules-migration-checks`)도 없다**(Terra·modules 양쪽 확인). 잡이 서기 전까지 modules 병합 전에는 이 다섯 검사가 돌지 않는 공백이다.
+
+4. **`examples/scene-login-demo`는 Terra에 남긴다 (M-7 해당 없음, 결정 2026-10-11, 사용자 승인).**
+   - 예제가 Terra 비공개 패키지 `@terra/scene-runtime`·`@terra/scene-schema`·`@terra/player`에 의존하는데, 이들은 D-1로 Terra에 영구 잔류하는 플랫폼 소유 모듈의 패키지다. modules에는 `@terra/*`를 의존으로 가진 package.json이 없어 옮기면 `npm ci`·`vite build`가 해석 단계에서 실패한다.
+   - 이관하려면 그 패키지들을 공개 게시해야 하는데 이는 1단계 범위 밖의 공개 결정이다.
+   - Terra CI `ci.yml`의 `Build examples/scene-login-demo` 단계는 modules 레이아웃 변경이 Terra를 깨뜨리는 것을 막는 가드(G-22)라 그대로 유지한다.
+
+### 사용자 결정 대기
+
+| 항목 | 내용 |
+| --- | --- |
+| P-3 (라이선스) | 미지정. terra-sdk·terra-agent·modules 모두 LICENSE 없음. 사용자 결정 대기 |
 
 > 이 문서는 네 레포(`Terra` · `modules` · `terra-sdk` · `terra-agent`)에 **같은 내용**으로 놓인다.
 > 각 레포의 세션은 자기 레포의 절(§5)을 맡고, 나머지는 경계를 이해하기 위해 읽는다.
@@ -129,7 +174,7 @@ Terra (비공개) ─────────┘      ← Terra 는 terra-sdk ·
 | M-4 | `io.terra.io-weave`: `terra-io-weave` 512줄을 모듈 안으로 가져옴(`weave/` 또는 하위 패키지). 그 안의 `terra-protocol` 의존은 SDK로 | 작음 |
 | M-5 | CI: `TERRA_CHECKOUT_SSH_KEY` 의존 제거(pack 검증이 Terra 체크아웃을 쓰는 부분이 남으면 이유를 문서에 적고 최소화), 스키마 대조를 건너뛰지 못하게 | 작음 |
 | M-6 | `check-schema-drift`: Terra 체크아웃이 없을 때 "건너뜀"이 아니라 정본을 받아 오거나 실패하게 | 작음 |
-| M-7 | Terra에서 `examples/scene-login-demo` 이관 수령 | 작음 |
+| M-7 | Terra에서 `examples/scene-login-demo` 이관 수령 | 작음 → 2026-10-11 결정: 이관하지 않음(진행 현황 참조) |
 | M-8 | README·`docs/layout.md`에 독립 빌드 절차(클론 한 번으로 빌드) 반영 | 작음 |
 
 **완료 정의**: 빈 머신에서 `git clone modules` 한 번으로 14개 모듈이 빌드되고, CI가 Terra SSH 키 없이 통과한다.
@@ -143,7 +188,7 @@ Terra (비공개) ─────────┘      ← Terra 는 terra-sdk ·
 | T-3 | `terra-agent-core` 제거 → `terra-cli`(`internal/mcp/server.go`, `internal/app/mcp.go`, `internal/client/client.go`)가 `terra-agent`를 require | 중 |
 | T-4 | `terra-io-weave` 제거(M-4 이후) | 작음 |
 | T-5 | `go.work` 정리, `Test-ProductSourceLayout.ps1` 등 경로를 가정하는 도구 확인 | 작음 |
-| T-6 | `examples/scene-login-demo`를 `modules`로 이관(M-7과 짝), `module/README.md`와 구현 인벤토리(`docs/reference/implemented-features.md`)·점검표 갱신 | 작음 |
+| T-6 | `examples/scene-login-demo`를 `modules`로 이관(M-7과 짝), `module/README.md`와 구현 인벤토리(`docs/reference/implemented-features.md`)·점검표 갱신 | 작음 → 2026-10-11 결정: 이관하지 않음(진행 현황 참조) |
 | — | **변경 없음**: tree 레지스트리, 6개 잔류 모듈, 매니페스트 스키마 정본, 번들 구성 | – |
 
 ## 6. 순서
@@ -168,8 +213,10 @@ Terra (비공개) ─────────┘      ← Terra 는 terra-sdk ·
 - `terra-protocol` 3파일이 같은 패키지의 다른 파일 식별자를 참조하는지(정의 위치 검색까지만 했고 컴파일로 검증하지 않음).
   - **해소(terra-sdk S-6, 2026-10-09)**: 3파일과 테스트를 단독 패키지로 복사해 `go build`·`go vet`·`go test`가 통과했다. 다른 파일의 식별자를 참조하지 않는다.
 - `CatalogOperation` 딸린 타입의 연쇄.
+  - **해소(terra-agent A-3, 2026-10-09)**: 연쇄는 4개 타입에서 닫힌다. 결과는 §7.2.
 - T-1 별칭 전환이 코어 전체를 깨지 않는지(이론상 안전, 빌드 미확인).
   - **부분 해소(T-1, 2026-10-09)**: Linux에서 32개 모듈 전체 빌드·테스트가 변경 전과 동일하다(§7.1 N-10). Windows는 Terra CI 확인 전까지 미확인.
+  - **정정(2026-10-11)**: Windows도 확인됐다. 병합된 Terra#158의 `Go (windows)`를 포함한 CI 체크가 모두 성공이다. 위 "Windows는 미확인"은 시차로 낡았다.
 - `agent` 모듈이 `agentcore` 27개 심볼 중 실제로 호출하는 경로가 CLI와 겹치는지.
 - `bundled-modules.json`의 위치와 번들 구성이 모듈 경로 개명에 영향받는지.
 - 로컬 Terra `main`은 `origin/main`보다 423커밋 뒤처져 있었다. **작업 전 `git fetch`하고 `origin/main`에서 새 브랜치를 딴다.**
@@ -194,6 +241,55 @@ Terra (비공개) ─────────┘      ← Terra 는 terra-sdk ·
 | N-9 | **검증한 것**: Go 1.23.0 툴체인(`go.mod`의 최저 버전)과 1.25.0에서 `go build`·`go vet`·`go test -count=1 ./...` 통과. 외부 의존 0(`go.mod`에 `require` 없음) | Windows·macOS는 CI 매트릭스로만 확인한다 |
 | N-10 | **T-1 별칭 안전성 확인**: 코어의 `terra-module-runtime`·`terra-svi`·`terra-protocol`을 SDK 별칭으로 바꿔도 호출부는 한 줄도 바뀌지 않았다. 워크스페이스 32개 모듈 전체의 `go build`와 `go test -count=1`이 변경 전과 변경 후 모두 102개 패키지 `ok`, 패키지 목록 차이 0([Terra#158](https://github.com/StellaxiaLab/Terra/pull/158), Linux) | 위 §7의 "T-1 별칭 전환이 코어 전체를 깨지 않는지"는 Linux에서는 해소. Windows 전용 시험은 Terra CI로 확인해야 한다 |
 | N-11 | **T-1에 없던 작업**: 별칭 전환 후 `terra-module-runtime`/`svi`/`protocol`을 `replace`로 끌어오는 모듈은 `go.mod`에 `terra-sdk`가 없으면 단독 빌드(`GOWORK=off`)가 깨진다. 의존 모듈 14곳의 `go.mod`/`go.sum`에 `terra-sdk v0.1.0` 한 줄과 해시 두 줄을 더했다. `go get`은 `go` 지시자와 의존성을 올리는 모듈이 있어 그런 3곳은 되돌리고 정확한 줄만 넣었다 | M-2(modules의 10개 Go 모듈)도 같은 영향을 받는다. 변경 전부터 단독 빌드가 실패하던 4개(`io.terra.sample.status`, `terra-cli`, `terra-agent-core`, `module-gateway-integration`)는 이번 범위 밖이다 |
+
+
+### 7.2 P-1 결과 — `CatalogOperation` 계열 (terra-agent A-3)
+
+> terra-agent 사본의 §7.1에만 있던 내용을 2026-10-11에 정본으로 옮겼다(글은 그대로, 번호만 바꿈).
+
+조사 기준: Terra `origin/main` b2a76a6, `products/common/packages/terra-agent-core`와 `terra-api-contract/catalog.go`.
+`terra-agent-core`가 `terra-api-contract`에서 쓰는 심볼은 `CatalogOperation` 하나뿐이다(`approval.go`·`approver.go`·`gateway.go`에서 9회). 다른 Terra 내부 패키지 의존은 없다.
+
+**연쇄 (모두 `catalog.go` 안, 리프 타입)**
+
+```text
+CatalogOperation
+├─ Availability  *CatalogAvailability   (string, []string)
+├─ Execution     *CatalogExecution      (string)
+├─ Output        *CatalogOutput         (string)
+├─ SideEffects   []CatalogSideEffect    (string)
+└─ Input         json.RawMessage
+```
+
+딸린 타입 4개는 `string`·`[]string`·`json.RawMessage`만 갖는다. 더 내려가는 타입이 없다. 원본 `go.mod`가 끌고 오던 `jsonschema`·`regexp2`·`x/text`는 `terra-api-contract`의 나머지 코드(검증기)가 쓰는 것이고 agentcore는 쓰지 않는다. 새 `go.mod`는 `require`가 0개다.
+
+**agentcore가 실제로 읽는 필드 (판정·투영에 쓰임)**
+
+| 타입 | 필드 | 쓰는 곳 |
+| --- | --- | --- |
+| `CatalogOperation` | `OperationID` | 사전 승인 대조, 기록, 검색 요약 |
+| | `Title`, `Summary`, `Category`, `Permissions` | 검색 요약(`terra_search_operations`) |
+| | `Execution`, `Output`, `SideEffects` | 승인 표, 검색 요약, 호출 응답 |
+| `CatalogExecution` | `Risk`, `ConfirmationMode`, `IdempotencyMode`, `RetryMode` | `Decide`, `AllowsRetry` |
+| `CatalogOutput` | `Mode` | stream 거절, accepted-job 안내, 검색 요약 |
+| `CatalogSideEffect` | `Action` | 읽기 전용 판정, 되돌릴 수 없는 부작용 판정 |
+
+**읽지 않지만 가져온 필드와 그 이유**
+
+`ProviderID`, `Version`, `Status`, `Tags`, `Bindings`, `Errors`, `Availability`(5필드 전부), `Input`, `CatalogExecution.Cancellation`, `CatalogSideEffect.ResourceID`는 agentcore의 어떤 판단에도 쓰이지 않는다.
+그러나 `describe` 도구가 `"operation": operation`으로 **operation 전체를 JSON으로 모델에 돌려주고**(`tools.go`), `ApprovalRequest.Operation`이 같은 값을 `Approver`에 넘긴다. 호출 방법을 알려 주는 `input` 스키마가 여기에 실려 나간다.
+"읽는 필드만" 정의하면 `describe` 출력에서 이 필드들이 사라져 동작이 달라진다. 작업 규칙(이동이지 변경이 아니다)이 "필요한 필드만"보다 앞서므로 `CatalogOperation`의 16개 필드를 모두 가져왔다. 원본에만 있고 agentcore를 거치지 않는 것은 가져오지 않았다(`CatalogProvider`, `CatalogFilter`, `CatalogPage`, `Catalog` 및 그 메서드).
+
+필드를 줄이고 싶다면 `describe` 출력이 줄어드는 것을 받아들이는 별도 결정이 필요하다. `catalog_test.go`의 `TestDescribeForwardsFieldsTheGateDoesNotRead`가 그 변화를 잡는다.
+
+**호환**
+
+JSON 태그는 원본과 같고, `TestCatalogOperationJSONRoundTripsEveryField`가 모든 필드의 왕복을 지킨다. Gateway가 내려주는 JSON은 그대로 읽힌다.
+Go 타입으로는 `apicontract.CatalogOperation`과 `agentcore.CatalogOperation`이 서로 다른 타입이다. 중첩 포인터 필드 때문에 직접 타입 변환도 되지 않는다. Terra에서 `terra-agent-core`를 import하는 곳은 `terra-cli`의 파일들뿐이고(`internal/{app/mcp.go, client/client.go, mcp/server.go, mcp/server_test.go}`; `terra-module-runtime/gateway_delegate.go`는 주석 언급만), 이들은 `apicontract`·`CatalogOperation`을 쓰지 않는다. 따라서 T-3에서 변환할 호출부는 없다.
+
+**남은 확인**
+
+- modules `a78819d`의 `io.terra.agent`는 `ApprovalRequest.Operation`의 하위 필드를 읽지 않는다(확인함). 사용 심볼은 47개(`docs/api.md` 1.2).
 
 ## 8. 하지 않는 일 (1단계 범위 밖)
 
