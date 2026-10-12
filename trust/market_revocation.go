@@ -221,8 +221,8 @@ func (s RevocationSnapshot) CheckDowngrade(id, candidate, installedSelected stri
 	return nil
 }
 
-// MarketGate is applied by InstallPackage when the grade came from a market
-// attestation.
+// MarketGate is the install-time revocation and downgrade gate a host applies
+// when a package's grade came from a market attestation.
 type MarketGate struct {
 	Snapshot          *RevocationSnapshot // nil = no snapshot known
 	Now               time.Time           // zero → time.Now
@@ -232,9 +232,8 @@ type MarketGate struct {
 	// snapshot no longer refuses, while a revocation the snapshot it does
 	// have names still does. It is for the tree (distribution) path, whose
 	// approver is the tree, not the market — an air-gapped tree must keep
-	// deploying after the snapshot TTL (the tree path is judged by its own approval, not by the snapshot clock). The direct
-	// market path never sets it: there a missing gate or a stale snapshot is
-	// fail-closed.
+	// deploying after the snapshot TTL. The direct market path never sets it:
+	// there a missing gate or a stale snapshot is fail-closed.
 	AllowStale bool
 }
 
