@@ -1,0 +1,97 @@
+{
+  "note": "Deterministic vectors for terra-module-runtime market signing. Regenerate: TERRA_WRITE_VECTORS=1 go test -run TestMarketVectors",
+  "manifest": "{\n  \"compatibility\": {\n    \"os\": [\n      \"linux\",\n      \"windows\",\n      \"macos\"\n    ],\n    \"products\": [\n      \"leaf\",\n      \"tree\"\n    ]\n  },\n  \"contracts\": {\n    \"api\": \"contracts/api/terra-api.json\"\n  },\n  \"entrypoints\": {\n    \"process\": {\n      \"linux-amd64\": \"bin/linux-amd64/terra-backup\"\n    }\n  },\n  \"id\": \"io.terra.backup\",\n  \"kind\": \"service\",\n  \"provides\": {\n    \"capabilities\": [\n      {\n        \"id\": \"io.terra.backup\",\n        \"version\": \"1.0.0\"\n      }\n    ]\n  },\n  \"readiness\": {\n    \"operationId\": \"io.terra.backup.health.get\",\n    \"timeoutMs\": 15000\n  },\n  \"schemaVersion\": 2,\n  \"signature\": {\n    \"algorithm\": \"ed25519\",\n    \"issuer\": \"author\",\n    \"keyId\": \"416iAW7jPVfmv508\",\n    \"value\": \"bKmu_qhqb3gvXm5Mlbi4raKo8lBi2EI1mPmfPCt4S7rqGnwPnNJeSloziYCi3LmQ-9kpd4htb0N8Y0ZpzvW4Dw\"\n  },\n  \"update\": {\n    \"drainTimeoutMs\": 30000,\n    \"rollback\": true,\n    \"strategy\": \"start-before-stop\"\n  },\n  \"version\": \"1.0.0\"\n}",
+  "manifestPayloadHex": "7b22636f6d7061746962696c697479223a7b226f73223a5b226c696e7578222c2277696e646f7773222c226d61636f73225d2c2270726f6475637473223a5b226c656166222c2274726565225d7d2c22636f6e747261637473223a7b22617069223a22636f6e7472616374732f6170692f74657272612d6170692e6a736f6e227d2c22656e747279706f696e7473223a7b2270726f63657373223a7b226c696e75782d616d643634223a2262696e2f6c696e75782d616d6436342f74657272612d6261636b7570227d7d2c226964223a22696f2e74657272612e6261636b7570222c226b696e64223a2273657276696365222c2270726f7669646573223a7b226361706162696c6974696573223a5b7b226964223a22696f2e74657272612e6261636b7570222c2276657273696f6e223a22312e302e30227d5d7d2c2272656164696e657373223a7b226f7065726174696f6e4964223a22696f2e74657272612e6261636b75702e6865616c74682e676574222c2274696d656f75744d73223a31353030307d2c22736368656d6156657273696f6e223a322c22757064617465223a7b22647261696e54696d656f75744d73223a33303030302c22726f6c6c6261636b223a747275652c227374726174656779223a2273746172742d6265666f72652d73746f70227d2c2276657273696f6e223a22312e302e30227d",
+  "counterSignPayloadHex": "7b22636f6d7061746962696c697479223a7b226f73223a5b226c696e7578222c2277696e646f7773222c226d61636f73225d2c2270726f6475637473223a5b226c656166222c2274726565225d7d2c22636f6e747261637473223a7b22617069223a22636f6e7472616374732f6170692f74657272612d6170692e6a736f6e227d2c22656e747279706f696e7473223a7b2270726f63657373223a7b226c696e75782d616d643634223a2262696e2f6c696e75782d616d6436342f74657272612d6261636b7570227d7d2c226964223a22696f2e74657272612e6261636b7570222c226b696e64223a2273657276696365222c2270726f7669646573223a7b226361706162696c6974696573223a5b7b226964223a22696f2e74657272612e6261636b7570222c2276657273696f6e223a22312e302e30227d5d7d2c2272656164696e657373223a7b226f7065726174696f6e4964223a22696f2e74657272612e6261636b75702e6865616c74682e676574222c2274696d656f75744d73223a31353030307d2c22736368656d6156657273696f6e223a322c227369676e6174757265223a7b22616c676f726974686d223a2265643235353139222c22697373756572223a22617574686f72222c226b65794964223a22343136694157376a5056666d76353038222c2276616c7565223a22624b6d755f71687162336776586d354d6c62693472614b6f386c4269324549316d506d665043743453377271476e77506e4e4a65536c6f7a69594369334c6d512d396b706434687462304e3859305a707a7657344477227d2c22757064617465223a7b22647261696e54696d656f75744d73223a33303030302c22726f6c6c6261636b223a747275652c227374726174656779223a2273746172742d6265666f72652d73746f70227d2c2276657273696f6e223a22312e302e30227d",
+  "attestKeySeedHex": "6174746573742d31000000000000000000000000000000000000000000000000",
+  "attestPublicKey": "wXES5JBsxPgUbj28kXMzH_b2uSN5AsiPVjB03zQ-j-k",
+  "attestKeyId": "TfVsEbaqn1HF9j8P",
+  "attestation": {
+    "algorithm": "ed25519",
+    "keyId": "TfVsEbaqn1HF9j8P",
+    "issuer": "market:terra",
+    "signedAt": "2026-10-10T00:00:00Z",
+    "value": "sTt7eSzAbVxghzjt5JdWhIlTgX16plapJkPaNsYbTjDZf0qaKr5DP47NzIZwhuOAo--TdccRV2urj48yjCABAw",
+    "cert": {
+      "role": "attest",
+      "keyId": "TfVsEbaqn1HF9j8P",
+      "publicKey": "wXES5JBsxPgUbj28kXMzH_b2uSN5AsiPVjB03zQ-j-k",
+      "epoch": 1,
+      "notBefore": "2026-10-01T00:00:00Z",
+      "notAfter": "2027-10-01T00:00:00Z",
+      "signatures": [
+        {
+          "algorithm": "ed25519",
+          "keyId": "B_Kqzx9O5rk3RzQg",
+          "issuer": "market:terra",
+          "signedAt": "2026-10-01T00:00:00Z",
+          "value": "Bs8l-W5fHZsSGxEJ3QqnrUA4y8iwPt37A0NNzD8ffVGbLXuWFMqikLazAT4l1xF3LWY9NKK0MrW-kX2xyJXbCQ"
+        },
+        {
+          "algorithm": "ed25519",
+          "keyId": "cFZywS3OfD8dVrfF",
+          "issuer": "market:terra",
+          "signedAt": "2026-10-01T00:00:00Z",
+          "value": "ZSEzzvGnfHZZMqI_vZ5AkO-2pv17hb0uEVqyCkjDA0VcBRln5VnqL5n4pKf5bM6LlCesPVw_fisXnE6iB5BwDQ"
+        }
+      ]
+    }
+  },
+  "root": {
+    "marketId": "terra",
+    "threshold": 2,
+    "keyIds": [
+      "B_Kqzx9O5rk3RzQg",
+      "cFZywS3OfD8dVrfF",
+      "xeB6jpcx_96xf5la"
+    ]
+  },
+  "snapshotPayloadHex": "7b226b696e64223a2274657272612e6d61726b65742e7265766f636174696f6e73222c226d61726b65744964223a227465727261222c2273657175656e6365223a312c226973737565644174223a22323032362d31302d31305430303a30303a30305a222c22657870697265734174223a22323032362d31302d31375430303a30303a30305a222c227265766f6b6564223a5b7b226964223a22612e62222c2276657273696f6e223a222a222c22726561736f6e223a227365637572697479227d5d2c226c6174657374223a7b22636f6d2e61636d652e68656c6c6f223a22312e322e30227d7d",
+  "snapshot": {
+    "marketId": "terra",
+    "sequence": 1,
+    "issuedAt": "2026-10-10T00:00:00Z",
+    "expiresAt": "2026-10-17T00:00:00Z",
+    "revoked": [
+      {
+        "id": "a.b",
+        "version": "*",
+        "reason": "security"
+      }
+    ],
+    "latest": {
+      "com.acme.hello": "1.2.0"
+    },
+    "cert": {
+      "role": "revoke",
+      "keyId": "lcfIeranyEk-5urp",
+      "publicKey": "MiCzykojEIxoAzkVcT5r6Q8G2r-TK5ulRjXqts6ZiFk",
+      "epoch": 1,
+      "notBefore": "2026-10-01T00:00:00Z",
+      "notAfter": "2027-10-01T00:00:00Z",
+      "signatures": [
+        {
+          "algorithm": "ed25519",
+          "keyId": "B_Kqzx9O5rk3RzQg",
+          "issuer": "market:terra",
+          "signedAt": "2026-10-01T00:00:00Z",
+          "value": "-sroUryW7nS-oRbtde30-oE4D-4ieRc0ngRg_ei8U5AdgfcI0zmoNmr8hUXORJddcmaPD5gIVvzSMOTkgR-pDA"
+        },
+        {
+          "algorithm": "ed25519",
+          "keyId": "cFZywS3OfD8dVrfF",
+          "issuer": "market:terra",
+          "signedAt": "2026-10-01T00:00:00Z",
+          "value": "wtaxW9DHcgT36TLptBq6-R0cKXUhCp7oNjLpZZtgTryRAyE69DyjKXuuqzqhcKla8eEaL-5qeZ3sLXmw02kfAw"
+        }
+      ]
+    },
+    "signature": {
+      "algorithm": "ed25519",
+      "keyId": "lcfIeranyEk-5urp",
+      "issuer": "market:terra",
+      "signedAt": "2026-10-10T00:00:00Z",
+      "value": "YSHzYm6IeLgztdIg-LMweez5G5g1gYuDLf-BfBbWl55nr2rbnDYTB_XfL_qcTLxNubKmbWF57vcc41PSToX0Dw"
+    }
+  }
+}
