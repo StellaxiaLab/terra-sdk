@@ -4,7 +4,7 @@ doc_type: "reference"
 scope: "project"
 target: "terra-sdk"
 status: "draft"
-last_updated: "2026-10-09"
+last_updated: "2026-10-12"
 source_repo: "StellaxiaLab/Terra"
 source_commit: "b2a76a6d3f6c2d4e8a21fddc05649b95d0be6f58"
 related:
@@ -54,6 +54,23 @@ related:
 | S-7 | `tests/module-gateway-integration/module_contract_doc_test.go` | `conformance/` | 계약 검증 부분을 새로 작성(복사 아님). 아래 참조 |
 | S-8 | `docs/contracts/module-host-http-contract.md` | `docs/contracts/` | 본문 무변경, 머리에 사본 안내만 추가 |
 | S-8 | `docs/contracts/examples/module-host-minimal.py` | `docs/contracts/examples/` | 바이트 동일 |
+
+## 후속 추가 (v0.3.0) — `trust`, `pkgformat`
+
+원본은 Terra의 모듈 런타임(`terra-module-runtime`, 비공개 저장소)이다. 이전 시점의 출력과 바이트 단위로 같음을 골든 시험으로 고정했다. 선언 단위로 옮겼다: 같은 파일에 남은 노드 전용 선언(서명 검증기·신뢰 정책·설치 판정·저장소)은 가져오지 않았다. 함수 본문·오류 문자열·JSON 태그·정규화 바이트는 원본과 같다.
+
+| 원본 (`terra-module-runtime/`) | 이 레포 | 가져온 범위 |
+| --- | --- | --- |
+| `signature.go` | `trust/signature.go` | 서명·카운터서명 타입과 payload·서명 함수. `SignatureVerifier`·`TrustPolicy`·`TrustResult`·내장 키는 제외 |
+| `market_trust.go` | `trust/market_trust.go` | 루트·인증서·체인 검증 전부. 노드 설정 키와 내장 루트는 제외 |
+| `market_revocation.go` | `trust/market_revocation.go` | 스냅숏·판정·`MarketGate` 전부. `EvaluateInstalled`·파일 저장소는 제외 |
+| `semver.go` | `trust/semver.go` | 파싱·비교 비공개 구현만(`CheckDowngrade`용) |
+| `manifest.go`, `manifest_v1.go`, `payload.go`(일부), `scanner.go`의 `DecodeManifest`, `contributions.go`(일부) | `pkgformat/` | `Manifest` 모델·검증, v1 정규화. 장면 조회·스키마 임베드·`StampPayloadParts`/`VerifyPayload`는 제외 |
+| `configuration.go`, `permissions.go`, `archive.go` | `pkgformat/` | 전체 |
+| `testdata/market_vectors.json` | `trust/testdata/market_vectors.json` | 바이트 동일. `vectors.sha256`로 고정 |
+| 위 파일들의 시험 | `trust/*_test.go`, `pkgformat/*_test.go` | 노드 전용 심볼을 쓰지 않는 시험만. 벡터 재생성 경로는 옮기지 않았다 |
+
+원본과 다른 점: ① 내부 설계 문서·ADR 번호를 가리키는 주석을 자기 완결적인 설명으로 고쳤다(동작 무변경). ② 비공개 이름 3종을 처리했다 — `moduleIDPattern`은 `pkgformat.ValidModuleID`로, `cloneConfigValue`는 `pkgformat.CloneConfigValue`로 공개했고, `semver`/`parseSemver`/`compareSemver`는 `trust` 안에 비공개 사본을 둔다(Terra는 자기 범위 비교에 같은 코드를 계속 쓰므로 한 쪽을 고치면 다른 쪽도 고쳐야 한다). ③ 한국어 오류 문자열은 호출자가 비교할 수 있어 그대로 두었다.
 
 ## 원본에서 바꾼 것 (전부)
 

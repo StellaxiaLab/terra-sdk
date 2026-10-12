@@ -22,7 +22,7 @@ related:
 
 | 대상 | 규칙 |
 | --- | --- |
-| Go 모듈 | 단일 모듈 `github.com/StellaxiaLab/terra-sdk` 하나의 버전 (설계 P-2). 하위 패키지(`modulesdk` · `modulert` · `svi` · `protocol` · `conformance`)는 따로 버전을 갖지 않는다 |
+| Go 모듈 | 단일 모듈 `github.com/StellaxiaLab/terra-sdk` 하나의 버전 (설계 P-2). 하위 패키지(`modulesdk` · `modulert` · `svi` · `protocol` · `trust` · `pkgformat` · `conformance`)는 따로 버전을 갖지 않는다 |
 | 태그 | `vMAJOR.MINOR.PATCH`. Go 모듈 규약상 태그가 곧 릴리스다 |
 | 와이어 계약 | 환경변수 6 · 헤더 1 · 경로 2와 그 JSON 모양([[docs/contracts/module-host-http-contract]]). Go API와 **별개로** 더 엄격하게 다룬다(§3) |
 | 적합성 키트 | SDK와 같은 버전을 쓴다. 규칙이 늘어나면 §5를 따른다 |
@@ -48,6 +48,8 @@ v0.x에서는 semver 규약대로 MINOR에서도 Go API가 깨질 수 있다. �
 | 상수 값(`DelegatedCredentialPrefix` 등 와이어에 나가는 값) | 와이어 계약과 같게 취급 | |
 | `conformance` 키트의 API | MINOR에서 깨짐 허용 **[제안]** | |
 | `modulert`의 호스트 쪽 보조(`Activate` 등, 설계 §7 N-1) | MINOR에서 깨짐 허용 **[제안]**, 제거될 수 있음 | 모듈이 의존할 대상이 아니다 |
+| `trust`의 서명·인증서·폐기 **바이트 형식**(정규화 payload, JSON 필드와 의미, `Err*` 값) | **하위 호환 깨짐 불가 [제안]**: 추가만 허용, 바꿔야 하면 새 `kind`의 새 형식을 더하고 옛 형식은 계속 검증한다 | 이미 서명된 패키지·인증서·스냅숏이 계속 검증되어야 한다. 규칙은 [[docs/contracts/market-trust]] §8 |
+| `trust`·`pkgformat`의 Go 공개 심볼 이름·시그니처 | **v0.x 불안정**: MINOR에서 깨짐 허용 **[제안]**, 릴리스 노트 맨 위에 "깨짐"으로 적는다 | v0.3.0에서 처음 들어온 패키지다. 마켓·노드·퍼블리셔 도구가 쓴다. 모듈 런타임은 import할 필요가 없다 |
 
 ## 4. 폐기
 

@@ -57,3 +57,20 @@ v0.1.0 준비 시점(`go doc` 기준 내보낸 식별자)의 목록이다. 시�
 - 명령: `terra-conformance`
 
 사용 방법은 [[docs/guide/conformance|적합성 테스트 키트]]를 본다.
+
+## `trust` — 마켓·노드 공유 서명 형식 (v0.3.0에서 추가, 불안정 v0.x)
+
+- 서명: 타입 `TrustTier`, `TrustKey`, `ModuleSignature`, `CounterSignature`; 함수 `TrustKeyID`, `CanonicalManifestPayload`, `CanonicalCounterSignPayload`, `SignManifest`, `EmbedSignature`, `CounterSignManifest`; 상수 `AlgorithmEd25519`, 등급 `TrustCore`, `TrustBuiltin`, `TrustTrustedThirdParty`, `TrustTreePublished`, `TrustDevelopment`, `TrustQuarantined`
+- 마켓 루트·인증서: 타입 `MarketRoot`(+`Enabled`, `Issuer`, `Fingerprint`), `MarketKeyCertificate`; 함수 `CanonicalMarketCertPayload`, `SignMarketCertificate`, `VerifyMarketCertificate`; 상수 `MarketIssuerPrefix`, `TreeIssuerPrefix`, `PublisherIssuerPrefix`, `MarketRoleAttest`, `MarketRoleRevoke`, `AttestKindTree`, `AttestKindMarket`; 오류 `ErrMarketDisabled`, `ErrMarketCertInvalid`, `ErrMarketCertExpired`
+- 체인: 타입 `ChainAnchors`, `Attestation`, `ChainResult`(+`Endorsed`, `HasMarket`, `Provenance`); 함수 `VerifyChain`
+- 폐기: 타입 `RevocationSnapshot`(+`Fresh`, `Judge`, `CheckDowngrade`), `RevokedEntry`, `RevocationReason`, `RevocationVerdict`, `MarketGate`(+`Check`); 함수 `CanonicalSnapshotPayload`, `SignSnapshot`, `VerifySnapshot`, `AcceptSnapshot`, `NormalizeDigest`; 상수 `RevokeSecurity`, `RevokePolicy`, `RevokePublisher`; 오류 `ErrSnapshotRollback`, `ErrSnapshotSame`, `ErrSnapshotSignature`, `ErrSnapshotExpiredNew`, `ErrRevocationStale`, `ErrRevoked`, `ErrDowngrade`
+
+## `pkgformat` — 모듈 패키지 형식 (v0.3.0에서 추가, 불안정 v0.x)
+
+- 매니페스트: 타입 `Manifest`(+`Validate`), `Compatibility`, `Dependency`, `Entrypoints`, `Integrity`, `IntegrityPart`, `Provides`, `Capability`, `Permissions`, `UpdatePolicy`, `Readiness`(= `modulert.Readiness`); 함수 `ParseManifest`, `DecodeManifest`, `ManifestKinds`, `ManifestWrapsExternalService`, `CanonicalPartDigest`, `ValidModuleID`; 상수 `ManifestSchemaVersion`, `ManifestFileName`, `Kind*`
+- v1: 타입 `ManifestV1`, `EntrypointV1`, `RestartV1`, `CapabilitiesV1`, `LegacyV1`, `LegacyRestart`; 함수 `DecodeV1`, `NormalizeV1`, `NormalizeV1Bytes`
+- 설정 스키마: 타입 `Configuration`, `ConfigSchema`(+`SecretKeys`, `Effective`), `ConfigKeyIssue`, `ConfigKeyIssueCode`, `ConfigInvalidError`; 함수 `ParseConfigSchema`, `CloneConfigValue`; 상수 `ConfigType*`, `ConfigSchemaMaxBytes`, `ConfigSecretKeyword`, `ConfigRestartKeyword`, `ConfigIssue*`
+- 권한: 함수 `CanonicalPermissions`, `CanonicalPermissionsOf`, `NormalizePermission`, `NormalizePermissions`, `PermissionsNotIn`, `CoreOperationPermission`; 상수 `PermissionKind*`; 오류 `ErrInvalidPermission`
+- 아카이브: 타입 `ArchiveLimits`, `ArchiveInspection`; 함수 `DefaultArchiveLimits`, `WritePackage`, `OpenPackageManifest`, `InspectPackage`, `ExtractPackage`; 상수 `PackageExtension`
+
+계약은 [[docs/contracts/market-trust|마켓 신뢰 형식 계약]], 깨짐 허용 범위는 [[docs/policy/versioning|버전 정책]] §3을 본다.

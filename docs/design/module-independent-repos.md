@@ -59,6 +59,8 @@ Terra의 내부 `terra-module-sdk`·`terra-agent-core`·`terra-io-weave` 패키�
 > 각 레포의 세션은 자기 레포의 절(§5)을 맡고, 나머지는 경계를 이해하기 위해 읽는다.
 > 본문은 2026-10-09 결정과 그날 코드 조사(Terra `origin/main`, `modules` `origin/main` ca7d648)에 근거한다.
 
+> **갱신 메모 (2026-10-12, v0.3.0).** 사용자 결정으로 D-2의 "모듈 약속만" 범위, N-2의 `Manifest` 제외, D-14/§8의 "서명 체계는 1단계 밖"이 **뒤집혔다.** 마켓과 노드가 공유하는 서명·인증서·폐기 형식과 `Manifest` 모델이 공개 SDK의 `trust`·`pkgformat` 패키지로 들어왔다(v0.x 불안정 등급, 서명 바이트 형식은 [[docs/contracts/market-trust]] §8에 따라 깨지 않음). `modulert`와 모듈 약속의 표면은 그대로다. 본문은 이력이라 고치지 않았다.
+
 ## 1. 결정 (확정)
 
 | ID | 결정 |

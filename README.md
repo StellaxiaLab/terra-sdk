@@ -9,7 +9,7 @@ last_updated: "2026-10-09"
 
 # terra-sdk
 
-Terra 모듈이 호스트와 대화하는 약속을 구현한 얇은 공개 Go SDK.
+Terra 모듈이 호스트와 대화하는 약속을 구현한 얇은 공개 Go SDK. v0.3.0부터 패키지 마켓과 노드가 공유하는 서명·패키지 형식(`trust`, `pkgformat`)도 담는다. 모듈은 이 둘을 import할 필요가 없다.
 
 - Go 모듈 경로: `github.com/StellaxiaLab/terra-sdk` (단일 모듈)
 - 외부 의존 0 (표준 라이브러리만)
@@ -25,6 +25,8 @@ Terra 모듈이 호스트와 대화하는 약속을 구현한 얇은 공개 Go S
 | `github.com/StellaxiaLab/terra-sdk/modulert` | 호스트↔모듈 와이어 계약: 환경변수 이름, 경로, 헤더, 신원·핸드셰이크·코어 호출 DTO, 위임 도어, 공유 루트 |
 | `github.com/StellaxiaLab/terra-sdk/svi` | SVI 데이터 타입과 서술자 검증(`ValidateResource` 등) |
 | `github.com/StellaxiaLab/terra-sdk/protocol` | 입력 이벤트·권한·가상 입력 타입 |
+| `github.com/StellaxiaLab/terra-sdk/trust` | **(v0.3.0, 불안정 v0.x)** 마켓·노드 공유 서명 형식: 작성자 서명·카운터서명·마켓 루트와 키 인증서·폐기 스냅숏과 그 검증기. 계약은 [market-trust](docs/contracts/market-trust.md) |
+| `github.com/StellaxiaLab/terra-sdk/pkgformat` | **(v0.3.0, 불안정 v0.x)** 모듈 패키지 형식: Manifest v2·v1, 설정 스키마, 정규 권한 문자열, `.tmod` 아카이브와 한도. 마켓과 노드가 같은 판정을 하려고 쓴다 |
 | `github.com/StellaxiaLab/terra-sdk/testwait` | 테스트용 대기 도우미(`Until` 등, 예산은 `TERRA_TEST_WAIT_SCALE`로 조절) |
 | `github.com/StellaxiaLab/terra-sdk/conformance` | 적합성 테스트 키트 (`terra-conformance` 명령 포함) |
 
