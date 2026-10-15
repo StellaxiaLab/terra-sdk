@@ -53,8 +53,15 @@ v0.1.0 준비 시점(`go doc` 기준 내보낸 식별자)의 목록이다. 시�
 
 - 타입: `Spec`, `CheckOptions`, `Identity`, `Report`, `Result`
 - 함수: `Run`, `Check`, `NewIdentity`, `Identity.Env`, `Report.OK`, `Report.String`, `conformancetest.Run`
-- 상수: 계약 리터럴 9개(`Env*` 6, `CredentialHeader`, `HandshakePath`, `ReadinessPath`)
+- 추가(마켓 연동): 타입 `Status`, `JSONReport`, `JSONResult`; `Result.Level`, `Report.ToJSON`, `Report.MarshalJSON`, `Report.Counts`, `Report.Summary`; 필드 `Spec.SVI`·`Spec.CoreInvoke`·`CheckOptions.SVI`·`CheckOptions.CoreInvoke`; `Result.Status`·`Result.Rule`
+- 상수: 계약 리터럴 9개(`Env*` 6, `CredentialHeader`, `HandshakePath`, `ReadinessPath`), 선택 경로 `SVIResourcesPath`·`SVISinkPath`·`CoreInvokePath`, `WireContractVersion`, `ReportSchemaVersion`, 수준 `StatusPass`·`StatusFail`·`StatusWarn`·`StatusSkip`
 - 명령: `terra-conformance`
+
+## `compat` — 계약 버전과 compatibility (추가)
+
+- 타입: `Compatibility`, `Version`, `Range`. 이 `Compatibility`(`core`·`wireContract`)는 `pkgformat.Compatibility`(`products`·`hostRoles`·`keeper`·`os`)와 이름만 같고 내용이 다르다. 마켓 서버가 형식을 검사하는 쪽은 `compat`의 필드다([[docs/contracts/wire-contract-version]])
+- 함수/메서드: `Parse`, `Compatibility.Validate`, `Compatibility.Check`, `ParseVersion`, `Version.Compare`, `ParseRange`, `Range.Contains`
+- 상수: `ContractVersion`
 
 사용 방법은 [[docs/guide/conformance|적합성 테스트 키트]]를 본다.
 
@@ -67,7 +74,7 @@ v0.1.0 준비 시점(`go doc` 기준 내보낸 식별자)의 목록이다. 시�
 
 ## `pkgformat` — 모듈 패키지 형식 (v0.3.0에서 추가, 불안정 v0.x)
 
-- 매니페스트: 타입 `Manifest`(+`Validate`), `Compatibility`, `Dependency`, `Entrypoints`, `Integrity`, `IntegrityPart`, `Provides`, `Capability`, `Permissions`, `UpdatePolicy`, `Readiness`(= `modulert.Readiness`); 함수 `ParseManifest`, `DecodeManifest`, `ManifestKinds`, `ManifestWrapsExternalService`, `CanonicalPartDigest`, `ValidModuleID`; 상수 `ManifestSchemaVersion`, `ManifestFileName`, `Kind*`
+- 매니페스트: 타입 `Manifest`(+`Validate`), `Compatibility`(`products`·`hostRoles`·`keeper`·`os`; `compat.Compatibility`와 다른 개념), `Dependency`, `Entrypoints`, `Integrity`, `IntegrityPart`, `Provides`, `Capability`, `Permissions`, `UpdatePolicy`, `Readiness`(= `modulert.Readiness`); 함수 `ParseManifest`, `DecodeManifest`, `ManifestKinds`, `ManifestWrapsExternalService`, `CanonicalPartDigest`, `ValidModuleID`; 상수 `ManifestSchemaVersion`, `ManifestFileName`, `Kind*`
 - v1: 타입 `ManifestV1`, `EntrypointV1`, `RestartV1`, `CapabilitiesV1`, `LegacyV1`, `LegacyRestart`; 함수 `DecodeV1`, `NormalizeV1`, `NormalizeV1Bytes`
 - 설정 스키마: 타입 `Configuration`, `ConfigSchema`(+`SecretKeys`, `Effective`), `ConfigKeyIssue`, `ConfigKeyIssueCode`, `ConfigInvalidError`; 함수 `ParseConfigSchema`, `CloneConfigValue`; 상수 `ConfigType*`, `ConfigSchemaMaxBytes`, `ConfigSecretKeyword`, `ConfigRestartKeyword`, `ConfigIssue*`
 - 권한: 함수 `CanonicalPermissions`, `CanonicalPermissionsOf`, `NormalizePermission`, `NormalizePermissions`, `PermissionsNotIn`, `CoreOperationPermission`; 상수 `PermissionKind*`; 오류 `ErrInvalidPermission`
