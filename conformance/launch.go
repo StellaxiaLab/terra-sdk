@@ -24,6 +24,9 @@ type Spec struct {
 	ModuleID string
 	// OperationPath is passed to Check (optional).
 	OperationPath string
+	// SVI and CoreInvoke turn on the optional-path rules (see CheckOptions).
+	SVI        bool
+	CoreInvoke bool
 	// BindTimeout is how long the module has to start listening. Default 20s.
 	BindTimeout time.Duration
 	// Launches is how many times the module is started in a row, each with a
@@ -84,7 +87,7 @@ func runOnce(ctx context.Context, spec Spec, epoch uint64) (Report, error) {
 		report.add("module binds TERRA_LOOPBACK_ENDPOINT", err)
 		return report, nil
 	}
-	return Check(ctx, id, CheckOptions{OperationPath: spec.OperationPath}), nil
+	return Check(ctx, id, CheckOptions{OperationPath: spec.OperationPath, SVI: spec.SVI, CoreInvoke: spec.CoreInvoke}), nil
 }
 
 type process struct {

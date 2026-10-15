@@ -18,4 +18,14 @@ const (
 
 	HandshakePath = "/terra/handshake"
 	ReadinessPath = "/terra/readiness"
+
+	// Optional paths (contract section 6).
+	SVIResourcesPath = "/terra/svi/resources"
+	SVISinkPath      = "/terra/svi/sink"
+	// CoreInvokePath is served by the host, not by the module.
+	CoreInvokePath = "/terra/core/invoke"
 )
+
+// WireContractVersion is the module-host wire contract version this kit
+// checks. It mirrors compat.ContractVersion (a test pins the two together).
+const WireContractVersion = 1
