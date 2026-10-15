@@ -2,13 +2,18 @@
 // contract of a Terra host. It launches the program with a freshly issued
 // identity, plays the host, and prints one PASS/FAIL line per rule.
 //
-//	terra-conformance [-module-id id] [-operation /path] [-bind-timeout 20s] [-launches 2] -- command [args...]
+//	terra-conformance [-module-id id] [-operation /path] [-bind-timeout 20s] [-launches 2] [-json] [-svi] [-core-invoke] -- command [args...]
 //
-// Exit status: 0 all rules passed, 1 a rule failed, 2 usage or harness error.
+// With -json, stdout carries only one JSON document (conformance.JSONReport)
+// and the human lines are not printed.
+//
+// Exit status: 0 all rules passed (warnings and skips do not fail), 1 a rule
+// failed, 2 usage or harness error.
 package main
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"os"
@@ -26,6 +31,9 @@ func run(args []string) int {
 	operation := flags.String("operation", "", "one of the module's own routes to check for the credential guard (optional)")
 	bind := flags.Duration("bind-timeout", 20*time.Second, "how long the module has to start listening")
 	launches := flags.Int("launches", 2, "how many times to launch the module, each with a fresh identity")
+	asJSON := flags.Bool("json", false, "print one JSON report on stdout instead of PASS/FAIL lines")
+	svi := flags.Bool("svi", false, "also check the optional /terra/svi/* paths (module declares contributions.svi)")
+	coreInvoke := flags.Bool("core-invoke", false, "record the /terra/core/invoke rule (host-served; reported as skipped)")
 	if err := flags.Parse(args); err != nil {
 		return 2
 	}
@@ -44,8 +52,15 @@ func run(args []string) int {
 		OperationPath: *operation,
 		BindTimeout:   *bind,
 		Launches:      *launches,
+		SVI:           *svi,
+		CoreInvoke:    *coreInvoke,
 	})
-	fmt.Print(report.String())
+	if *asJSON {
+		out, _ := json.MarshalIndent(report.ToJSON(err), "", "  ")
+		fmt.Println(string(out))
+	} else {
+		fmt.Print(report.String())
+	}
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "terra-conformance:", err)
 		return 2

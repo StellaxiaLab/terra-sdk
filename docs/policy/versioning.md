@@ -5,7 +5,7 @@ scope: "project"
 target: "terra-sdk"
 status: "draft"
 version: "0.1-draft"
-last_updated: "2026-10-09"
+last_updated: "2026-10-11"
 related:
   - "[[docs/design/module-independent-repos]]"
   - "[[docs/contracts/module-host-http-contract]]"
@@ -60,13 +60,17 @@ v0.x에서는 semver 규약대로 MINOR에서도 Go API가 깨질 수 있다. �
 
 ## 5. 적합성 키트의 규칙 추가
 
-새 규칙은 이미 통과하던 모듈을 실패시킬 수 있다. **새 규칙은 한 MINOR 동안 경고로만 내고 다음 MINOR에서 실패로 올린다 [제안].** 키트에 경고 수준이 아직 없으므로(현재는 PASS/FAIL뿐) 이 규칙을 지키려면 키트 확장이 필요하다 — 미구현.
+새 규칙은 이미 통과하던 모듈을 실패시킬 수 있다. **새 규칙은 한 MINOR 동안 `warn`으로만 내고 다음 MINOR에서 `fail`로 올린다 [제안].** 키트는 이제 `pass`·`fail`·`warn`·`skip` 수준과 JSON 보고(`schemaVersion` 1)를 갖는다. 수준은 구현됐고, 어떤 규칙을 언제 올리는지는 아직 제안이다.
+
+**키트 버전 고정 [제안]**: 마켓 서버는 키트를 실행하지 않고 퍼블리셔의 자가 보고만 받는다. 키트를 올리는 것은 퍼블리셔(또는 그 CI)의 명시적 행동이고, 새 `fail` 규칙은 위 warn 단계를 거친 뒤에만 들어온다. 보고의 `wireContract`와 `schemaVersion`으로 어떤 키트가 판정했는지 남긴다.
 
 ## 6. 호스트와 모듈의 호환
 
 - 호스트(Terra)는 `terra-sdk`를 `type X = sdk.X`로 소비한다(설계 D-3). 호스트가 SDK를 올리면 모듈이 쓰는 와이어 계약이 같이 움직이므로 §3의 와이어 규칙이 호환성의 실질적 보증이다.
 - **호스트는 같은 MAJOR 안에서, v0.x에서는 직전 2개 MINOR 안에서 빌드된 모듈을 받아 주는 것을 목표로 한다 [제안].** 와이어 계약이 추가만 허용되므로 이 목표는 계약 규칙에서 따라 나온다.
-- 와이어 계약에 버전 표지가 **없다**(핸드셰이크 응답에도 환경변수에도). 계약 버전을 모듈이 선언하게 할지는 미결정이다(설계 §8의 "코어 버전 범위 필드(`compatibility`)"와 같은 결을 가지므로 1단계 범위 밖이다).
+- **계약 버전 표지**: `compat.ContractVersion`(정수, 현재 1)이 SDK가 구현한 와이어 계약의 버전이다. 증가는 호스트가 알아야 하는 추가가 있을 때뿐이고 내리지 않는다. **표지가 없으면 v1이다.** 핸드셰이크·환경변수에는 아직 표지를 싣지 않는다(싣는 설계는 [[docs/contracts/wire-contract-version]] §3에 **[제안]**).
+- **`compatibility`**: manifest가 `{"core": "<semver 범위>", "wireContract": N}`로 코어 버전 범위와 필요한 최소 계약 버전을 선언한다. 이 `compatibility`는 `pkgformat.Compatibility`(`products`·`hostRoles`·`keeper`·`os`)와 이름만 같고 내용이 다르다. 파서와 판정은 `compat` 패키지, 규칙(범위 문법, prerelease는 같은 `MAJOR.MINOR.PATCH`의 prerelease를 직접 적은 범위에만 든다)은 [[docs/contracts/wire-contract-version]]이 소유한다. 스키마 필드 추가는 Terra와 합의 후다.
+- `compat`의 공개 API는 v0.x 동안 MINOR에서 깨질 수 있다 **[제안]**. 단 `ContractVersion`의 의미(위)는 와이어 계약과 같게 취급한다.
 
 ## 7. v1.0 조건 (제안)
 
@@ -74,7 +78,7 @@ v0.x에서는 semver 규약대로 MINOR에서도 Go API가 깨질 수 있다. �
 
 1. Terra와 `modules`가 모두 태그 버전으로 소비하고 있다 (replace 없이).
 2. 연속 2개 MINOR 동안 와이어 계약과 `modulesdk` 공개 API의 깨짐이 없었다.
-3. 적합성 키트가 §5의 경고 수준을 갖췄다.
+3. 적합성 키트가 §5의 경고 수준을 갖췄다. (수준은 구현됨, 이 정책의 확정은 남음)
 4. 라이선스가 정해졌다(설계 P-3, 사용자 결정).
 
 ## 8. 잘못 나간 버전

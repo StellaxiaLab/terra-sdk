@@ -19,7 +19,7 @@ func Run(t testing.TB, spec conformance.Spec) {
 		t.Fatalf("conformance harness: %v", err)
 	}
 	for _, result := range report.Results {
-		if result.Err != nil {
+		if result.Level() == conformance.StatusFail {
 			t.Errorf("%s: %v", result.Name, result.Err)
 		}
 	}
