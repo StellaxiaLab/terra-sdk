@@ -73,4 +73,4 @@ v0.1.0 준비 시점(`go doc` 기준 내보낸 식별자)의 목록이다. 시�
 - 권한: 함수 `CanonicalPermissions`, `CanonicalPermissionsOf`, `NormalizePermission`, `NormalizePermissions`, `PermissionsNotIn`, `CoreOperationPermission`; 상수 `PermissionKind*`; 오류 `ErrInvalidPermission`
 - 아카이브: 타입 `ArchiveLimits`, `ArchiveInspection`; 함수 `DefaultArchiveLimits`, `WritePackage`, `OpenPackageManifest`, `InspectPackage`, `ExtractPackage`; 상수 `PackageExtension`
 
-계약은 [[docs/contracts/market-trust|마켓 신뢰 형식 계약]], 깨짐 허용 범위는 [[docs/policy/versioning|버전 정책]] §3을 본다.
+계약은 [[docs/contracts/market-trust|마켓 신뢰 형식 계약]](전송은 [[docs/contracts/market-http-api|마켓 HTTP 프로토콜 계약]]), 깨짐 허용 범위는 [[docs/policy/versioning|버전 정책]] §3을 본다.

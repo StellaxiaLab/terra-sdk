@@ -9,12 +9,13 @@ last_updated: "2026-10-12"
 related:
   - "[[docs/policy/versioning]]"
   - "[[docs/reference/public-symbols]]"
+  - "[[docs/contracts/market-http-api]]"
 ---
 
 # 마켓 신뢰 형식 계약
 
 패키지 마켓과 Terra 노드가 **같은 바이트**에 서명하고 같은 판정을 내리도록 `trust` 패키지가 정한 형식이다.
-서명은 바이트를 덮으므로, 이 문서의 정규화 규칙이 곧 계약이다. 코드는 [`trust`](../../trust)와 [`pkgformat`](../../pkgformat), 골든 벡터는 [`trust/testdata/market_vectors.json`](../../trust/testdata/market_vectors.json)이다.
+서명은 바이트를 덮으므로, 이 문서의 정규화 규칙이 곧 계약이다. 이 문서는 **서명·인증서·폐기 형식**의 정본이고, 그 객체가 HTTP로 오가는 경로·요청·응답·오류 코드는 [[docs/contracts/market-http-api|마켓 HTTP 프로토콜 계약]]이 정본이다. 한 사실은 한쪽에만 적는다. 코드는 [`trust`](../../trust)와 [`pkgformat`](../../pkgformat), 골든 벡터는 [`trust/testdata/market_vectors.json`](../../trust/testdata/market_vectors.json)이다.
 
 > 안정성: 두 패키지는 v0.x 불안정 등급이지만 **서명 바이트 형식은 §8의 더 엄격한 규칙**을 따른다.
 
