@@ -66,12 +66,12 @@ terra-conformance -module-id <id> -operation /api/modules/<id>/v1/status -- ./my
 echo $?   # 0 통과(warn·skip은 실패 아님) · 1 규칙 위반 · 2 사용법/하네스 오류
 ```
 
-기계가 읽는 보고서가 필요하면 `-json`을 붙인다(`-json`은 다음 릴리스부터 SDK에 들어 있다. 그 전 태그의 `terra-conformance`에는 없다). stdout에는 JSON 문서 하나만 나가고 종료 코드는 위와 같다. 필드는 `schemaVersion`, `ok`, `wireContract`, `error`(하네스 오류일 때만), `results[{name, status, error, rule}]`이며 `status`는 `pass`·`fail`·`warn`·`skip`이다. `ok`는 `fail`이 없고 `pass`가 하나 이상일 때만 true이므로 `warn`·`skip`은 `ok`를 깨지 않는다. 자세한 모양은 [[docs/guide/conformance|적합성 키트]]를 본다.
+기계가 읽는 보고서가 필요하면 `-json`을 붙인다(`-json`은 v0.4.0부터 SDK에 들어 있다. 그 전 태그의 `terra-conformance`에는 없다). stdout에는 JSON 문서 하나만 나가고 종료 코드는 위와 같다. 필드는 `schemaVersion`, `ok`, `wireContract`, `error`(하네스 오류일 때만), `results[{name, status, error, rule}]`이며 `status`는 `pass`·`fail`·`warn`·`skip`이다. `ok`는 `fail`이 없고 `pass`가 하나 이상일 때만 true이므로 `warn`·`skip`은 `ok`를 깨지 않는다. 자세한 모양은 [[docs/guide/conformance|적합성 키트]]를 본다.
 
 **마켓은 이 키트를 실행하지 않는다.** 퍼블리셔 코드를 마켓 호스트에서 돌리지 않으려는 설계다. 결과를 마켓에 알리고 싶으면 퍼블리셔가 요약을 **자가 보고**로 붙인다(§5 6단계).
 마켓은 모양만 확인해 저장하고, 카탈로그에 `conformance: {source:"self_reported", signed:false, …}`로 보인다. 자가 보고 `fail`도 업로드를 막지 않으며, 노드·tree는 이 값을 판정에 쓰지 않는다.
 
-> 참고: Terra CLI의 `--conformance-report`는 `-json` 보고서를 받는다. `-json`은 SDK의 다음 릴리스부터 들어 있으므로, 그보다 앞선 태그의 키트로는 이 옵션에 넘길 보고서를 만들 수 없다.
+> 참고: Terra CLI의 `--conformance-report`는 `-json` 보고서를 받는다. `-json`은 SDK v0.4.0부터 들어 있으므로, 그보다 앞선 태그의 키트로는 이 옵션에 넘길 보고서를 만들 수 없다.
 > 그런 경우에는 `--conformance-report` 없이 올리면 된다(카탈로그에는 "보고 없음"으로 보인다). 업로드 헤더에 실리는 요약의 모양(`status`는 `pass`·`fail`·`skipped`)은 [[docs/contracts/market-http-api|마켓 HTTP 프로토콜 계약]] §4.5가 정한다. 서버는 키트를 실행하지 않고 자가 보고를 모양만 확인해 저장한다.
 
 ## 5. 게시 절차
