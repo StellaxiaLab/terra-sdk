@@ -1,0 +1,34 @@
+{
+  "about": "terra_name grammar golden vectors (p1-contracts.md §4). A service that copies this file must produce exactly these results with its own parser.",
+  "valid": [
+    {"in": "rdk.lab.marui.terra", "label": "rdk", "tree": "lab", "handle": "marui", "fqdn": "rdk.lab.marui.terra", "zone": "lab.marui.terra"},
+    {"in": "desk.marui.terra", "label": "desk", "tree": "", "handle": "marui", "fqdn": "desk.marui.terra", "zone": "marui.terra"},
+    {"in": "  Desk.Marui.TERRA. ", "label": "desk", "tree": "", "handle": "marui", "fqdn": "desk.marui.terra", "zone": "marui.terra"},
+    {"in": "a-1.b2.c-3.terra", "label": "a-1", "tree": "b2", "handle": "c-3", "fqdn": "a-1.b2.c-3.terra", "zone": "b2.c-3.terra"},
+    {"in": "0.lab.marui.terra", "label": "0", "tree": "lab", "handle": "marui", "fqdn": "0.lab.marui.terra", "zone": "lab.marui.terra"}
+  ],
+  "invalid": [
+    {"in": "", "why": "empty"},
+    {"in": "marui.terra", "why": "two labels"},
+    {"in": "a.b.c.marui.terra", "why": "five labels"},
+    {"in": "rdk.lab.marui.com", "why": "not .terra"},
+    {"in": "rdk..marui.terra", "why": "empty label"},
+    {"in": "-rdk.marui.terra", "why": "leading hyphen"},
+    {"in": "rdk-.marui.terra", "why": "trailing hyphen"},
+    {"in": "rd_k.marui.terra", "why": "underscore"},
+    {"in": "xn--9n2bp8q.marui.terra", "why": "IDN not opened"},
+    {"in": "rdk.marui.terra..", "why": "two trailing dots"},
+    {"in": "박사님.marui.terra", "why": "non-ASCII"},
+    {"in": "\u212adesk.marui.terra", "why": "KELVIN SIGN must not fold to k"},
+    {"in": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.marui.terra", "why": "64-char label"}
+  ],
+  "classify": [
+    {"in": "rdk.lab.marui.terra", "kind": "terra_name"},
+    {"in": "Desk.Marui.TERRA.", "kind": "terra_name"},
+    {"in": "broken..terra", "kind": "terra_name"},
+    {"in": "node_1787923476493_4c773555dd1dd13d", "kind": "node_id"},
+    {"in": "10.42.0.11", "kind": "cluster_address"},
+    {"in": "marui-server", "kind": "display_name"},
+    {"in": "terra", "kind": "display_name"}
+  ]
+}

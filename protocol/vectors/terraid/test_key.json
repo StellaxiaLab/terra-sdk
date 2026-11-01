@@ -1,0 +1,14 @@
+{
+  "comment": "TEST KEY ONLY. Ed25519 private key = NewKeyFromSeed(seed_hex). Never trust this key outside tests.",
+  "alg": "EdDSA",
+  "kid": "terraid-test-2026-10",
+  "seed_hex": "085c0ac77a458d60db9e259d10ce00ce1c46308f89d36ac453311c45806cea35",
+  "public_jwk": {
+    "kty": "OKP",
+    "crv": "Ed25519",
+    "kid": "terraid-test-2026-10",
+    "x": "xI-M8ni7rbz7aiibteuWi61r6nLmQ63QstcaBJGith4",
+    "alg": "EdDSA",
+    "use": "sig"
+  }
+}

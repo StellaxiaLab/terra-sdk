@@ -1,2 +1,4 @@
 # Golden vectors are byte-pinned by testdata/vectors.sha256: never convert line endings.
 trust/testdata/* -text
+# Hosted-access golden vectors are read byte for byte by other repositories: keep LF.
+protocol/vectors/**/*.json -text

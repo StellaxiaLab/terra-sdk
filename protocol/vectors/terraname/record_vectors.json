@@ -1,0 +1,67 @@
+{
+  "slug": [
+    {
+      "display_name": "Marui Desk",
+      "dns_label": "marui-desk"
+    },
+    {
+      "display_name": "rdk-1",
+      "dns_label": "rdk-1"
+    },
+    {
+      "display_name": "  --Lab__PC 02--",
+      "dns_label": "lab-pc-02"
+    },
+    {
+      "display_name": "박사님 데스크탑",
+      "dns_label": ""
+    },
+    {
+      "display_name": "박사님 desk",
+      "dns_label": "desk"
+    },
+    {
+      "display_name": "xn--abc",
+      "dns_label": "xn-abc"
+    },
+    {
+      "display_name": "",
+      "dns_label": ""
+    }
+  ],
+  "signing": [
+    {
+      "record": {
+        "fqdn": "rdk.lab.marui.terra",
+        "node_id": "node_1787923476493_4c773555dd1dd13d",
+        "tree_id": "tree_01JB",
+        "tree_public_key": "MCowBQYDK2VwAyEA",
+        "tree_origin": "https://lab.example.net",
+        "canonical_fqdn": "rdk.lab.maru.terra",
+        "issued_at": "2026-10-29T00:00:00Z",
+        "ttl_seconds": 300,
+        "key_id": "names-2026-10",
+        "signature": "j8PTjRj5wjQzllu1q5MkOsPI8rpYc0kvSc9VeuPyYDx56rjT/tM66w7C7LFqiLFUrQSb6a9E2xqJSiTKGk1fBw=="
+      },
+      "signing_bytes_hex": "74657272612d6e616d652d7265636f72642f76310a72646b2e6c61622e6d617275692e74657272610a6e6f64655f313738373932333437363439335f346337373335353564643164643133640a747265655f30314a420a4d436f77425159444b325677417945410a323032362d31302d32395430303a30303a30305a0a3330300a6e616d65732d323032362d31300a63616e6f6e6963616c5f6671646e3d72646b2e6c61622e6d6172752e74657272610a747265655f6f726967696e3d68747470733a2f2f6c61622e6578616d706c652e6e6574",
+      "ed25519_seed_hex": "0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20",
+      "public_key_b64": "ebVWLo/mVPlAeLES6KmLp5AfhTrmlb7X4OORC60ElmQ=",
+      "signature_b64": "j8PTjRj5wjQzllu1q5MkOsPI8rpYc0kvSc9VeuPyYDx56rjT/tM66w7C7LFqiLFUrQSb6a9E2xqJSiTKGk1fBw=="
+    },
+    {
+      "record": {
+        "fqdn": "desk.marui.terra",
+        "node_id": "node_a",
+        "tree_id": "tree_02",
+        "issued_at": "2026-10-29T12:30:00Z",
+        "ttl_seconds": 0,
+        "key_id": "names-2026-10",
+        "signature": "Weg0bNtKhEno5gBSezXxt3k7X+caW/hqvEkvW9x1p+B5p9BjyFEuvDPCA+/NCDDwdYDey25HQqRPe4uQUJ0cDg=="
+      },
+      "signing_bytes_hex": "74657272612d6e616d652d7265636f72642f76310a6465736b2e6d617275692e74657272610a6e6f64655f610a747265655f30320a0a323032362d31302d32395431323a33303a30305a0a300a6e616d65732d323032362d3130",
+      "ed25519_seed_hex": "0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20",
+      "public_key_b64": "ebVWLo/mVPlAeLES6KmLp5AfhTrmlb7X4OORC60ElmQ=",
+      "signature_b64": "Weg0bNtKhEno5gBSezXxt3k7X+caW/hqvEkvW9x1p+B5p9BjyFEuvDPCA+/NCDDwdYDey25HQqRPe4uQUJ0cDg=="
+    }
+  ]
+}
