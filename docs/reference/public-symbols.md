@@ -4,7 +4,7 @@ doc_type: "reference"
 scope: "project"
 target: "terra-sdk"
 status: "draft"
-last_updated: "2026-10-09"
+last_updated: "2026-11-01"
 related:
   - "[[docs/reference/provenance]]"
   - "[[docs/policy/versioning]]"
@@ -43,6 +43,23 @@ v0.1.0 준비 시점(`go doc` 기준 내보낸 식별자)의 목록이다. 시�
 - 타입: `InputPermissionTier`, `KeyEvent`, `PointerButton`, `PointerEvent`, `PointerPosition`
 - 함수/메서드: `InputTierForKind`, `IsTerraVirtualInput`, `NormalizePixels`, `PointerPosition.ToPixels`
 - 상수: `InputTierKeyboard`, `InputTierObserve`, `InputTierPointer`, `InputTierRaw`, `PointerButtonLeft`, `PointerButtonMiddle`, `PointerButtonRight`, `PointerPositionMax`, `VirtualInputBus`, `VirtualInputProduct`, `VirtualInputVendor`
+
+## `protocol` — 접속 서비스 계약 (v0.5.0에서 추가)
+
+Terra ID 토큰·키 묶음, `.terra` 이름·이름 레코드, 접속 서비스 위임 의도. Terra `terra-protocol`이 같은 이름을 별칭으로 다시 내보낸다.
+
+- Terra ID 타입: `TerraIDClaims`, `TerraIDActor`, `TerraIDAudience`, `TerraIDExpectation`, `ExternalExchangeRequest`, `JWK`, `JWKSet`, `TerraIDKeyBundle`
+- Terra ID 함수: `ValidateTerraIDClaims`, `VerifyTerraIDToken`, `SignTerraIDToken`, `ParseJWKSet`, `JWKFromPublicKey`, `ValidateTerraIDKeyBundle`, `TerraIDKeyBundle.KeysFor`, `TerraIDClaims.MultiFactor`, `TreeAudience`, `ParseTreeAudience`, `ValidTerraAccountID`, `ValidIssuerURL`
+- Terra ID 상수: `TerraIDUse*`(용도), `TerraIDTokenType*`, `TerraIDACR*`, `TerraIDRevokeReason*`, `TerraIDClockLeeway`·수명 상한, `JWSAlg*`, `TreeAudiencePrefix`, `TerraIDKeyBundleVersion`, 와이어 오류 코드 `ErrCode*`(`EXTERNAL_TOKEN_INVALID` 등)
+- 이름 타입·함수: `TerraName`, `ParseTerraName`, `TerraName.String`, `TerraName.Zone`, `ValidateDNSLabel`, `NormalizeDNSLabel`, `HasTerraNameSuffix`, `DNSLabelFromDisplayName`, `DNSLabelWithSuffix`, `TerraNameTLD`
+- 이름 레코드: `NameRecord`, `NameTombstone`, `NameVerifier`, `Ed25519NameVerifier`, `NameResolver`, `TreeNameEntry`, `TreeNamePublication`, `SignNameRecord`, `NameRecord.SigningBytes`·`ExpiresAt`·`Validate`, `NameRecordStateTombstone`
+- 위임 의도: `IntentNodeEnrollCodeIssue`·`IntentNodeEnrollExchange`·`IntentExternalIdentityRevoke`, `HostedAccessIntent`, `NodeEnrollCodeIssueInstruction`/`Answer`, `NodeEnrollExchangeInstruction`/`Answer`, `ExternalIdentityRevokeInstruction`/`Answer`, `Validate*Instruction`, `CheckEnrollCodeIssueBinding`, `MaxDelegatedEnrollCodeTTLSec`, `TreeReachability`·`TreeReachability*`, `ManagedAccountProvisionRequest`/`Answer`, `ValidateManagedAccountProvision`, `ManagedAccountHandleMaxRunes`
+- 노드 참조(일부): `NodeIDPrefix`, `ValidNodeID`, `NodeRefKind`·`NodeRef*` 5개, `ClassifyNodeRef`
+- 오류: `ErrTerraIDTokenInvalid` 외 Terra ID 오류, `ErrTerraNameInvalid`, `ErrName*`(레코드), `ErrInvalidDelegation`
+
+## `protocol/vectors` — 접속 서비스 골든 벡터 (v0.5.0에서 추가)
+
+- 변수: `FS` (`embed.FS`; `terraid/{tokens,jwks,key_bundle,test_key}.json`, `terraname/{vectors,record_vectors}.json`)
 
 ## `testwait` — 테스트용 대기 도우미 (v0.2.0에서 추가)
 

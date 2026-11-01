@@ -4,7 +4,7 @@ doc_type: "reference"
 scope: "project"
 target: "terra-sdk"
 status: "draft"
-last_updated: "2026-10-12"
+last_updated: "2026-11-01"
 source_repo: "StellaxiaLab/Terra"
 source_commit: "b2a76a6d3f6c2d4e8a21fddc05649b95d0be6f58"
 related:
@@ -86,6 +86,23 @@ related:
 
 **Terra에 같은 코드가 둘이 된다.** Terra의 `terra-svi`는 타입을 SDK 별칭으로 바꿨지만(T-1) `ValidateResource`는 자기 사본을 갖고 있다. 오류 변수도 별개라
 `errors.Is(err, sdksvi.ErrInvalidResource)`는 Terra의 오류에 거짓이다. 설계 D-3("원본은 공개 SDK 한 곳")대로 하려면 Terra 쪽이 SDK 것을 부르게 바꿔야 한다(Terra 후속 작업).
+
+## 후속 추가 (v0.5.0) — 접속 서비스 계약
+
+원본은 Terra `origin/main` **`5179f2c0`** (2026-11-01)의 `P/terra-protocol/`이다. 계약을 공개 SDK 한 곳에 두고 비공개 서비스(terra-id·terra-access)가 사본 없이 의존하게 하려는 이전이다(Terra ADR-ID-001 Q-ID-8, p1-contracts.md §8.1 M1).
+
+| 원본 (`P/terra-protocol/`) | 이 레포 | 가져온 범위 |
+| --- | --- | --- |
+| `terraid.go`, `terraid_jws.go`, `terraid_keybundle.go` (+시험) | `protocol/` | 전체. `terraid.go`는 소유를 말하는 주석 한 문단만 고침 |
+| `terraname.go`, `terraname_record.go` (+시험) | `protocol/` | 전체. `hasTerraNameSuffix`를 `HasTerraNameSuffix`로 공개(Terra `noderef.go`가 부른다) |
+| `hosted_access_intents.go` (+시험) | `protocol/` | 전체. 시험 중 Terra 전용 이름(`ControlInstructionIntent`·`TreeLoginDescriptor`)을 쓰는 둘은 Terra에 남김 |
+| `dnslabel_slug.go` | `protocol/dnslabel_slug.go` | 전체 (이름 레코드 벡터 생성기가 쓴다) |
+| `noderef.go` (일부) | `protocol/noderef.go` | `NodeIDPrefix`·`ValidNodeID`·`NodeRefKind`·`ClassifyNodeRef`만. 참조 색인·표시 이름 규칙은 Terra에 남음 |
+| `delegation.go` (일부) | `protocol/delegation.go` | `ErrInvalidDelegation`만. 메시지 문자열이 같아 Master가 와이어에 싣는 오류 문장이 바뀌지 않는다 |
+| `noderef_terraname_test.go` (일부) | `protocol/dnslabel_slug_test.go` | 슬러그·이름 레코드 서명 시험 4개 |
+| `testdata/terraid/*`, `testdata/terraname/*` | `protocol/vectors/` | 바이트 동일(git blob 동일). `-text`로 줄끝 고정. `vectors.FS`로 내보낸다 |
+
+함수 본문·오류 문자열·JSON 태그·와이어 오류 코드는 원본과 같다.
 
 ## S-7은 복사가 아니다
 
