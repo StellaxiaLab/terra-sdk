@@ -93,19 +93,24 @@ type EndpointDescriptor struct {
 }
 
 type ResourceDescriptor struct {
-	ResourceID    string               `json:"resource_id"`
-	NodeID        string               `json:"node_id"`
-	Kind          string               `json:"kind"`
-	CanonicalName string               `json:"canonical_name"`
-	DisplayName   string               `json:"display_name,omitempty"`
-	ProviderID    string               `json:"provider_id"`
-	Owner         SubjectRef           `json:"owner"`
-	Labels        map[string]string    `json:"labels,omitempty"`
-	Generation    uint64               `json:"generation"`
-	Revision      uint64               `json:"revision"`
-	Status        ResourceStatus       `json:"status"`
-	ExpiresAt     time.Time            `json:"expires_at"`
-	Endpoints     []EndpointDescriptor `json:"endpoints"`
+	ResourceID    string            `json:"resource_id"`
+	NodeID        string            `json:"node_id"`
+	Kind          string            `json:"kind"`
+	CanonicalName string            `json:"canonical_name"`
+	DisplayName   string            `json:"display_name,omitempty"`
+	ProviderID    string            `json:"provider_id"`
+	Owner         SubjectRef        `json:"owner"`
+	Labels        map[string]string `json:"labels,omitempty"`
+	Generation    uint64            `json:"generation"`
+	Revision      uint64            `json:"revision"`
+	Status        ResourceStatus    `json:"status"`
+	// StatusReason says why Status is not available, as a short code
+	// ("module_stopped", "rtsp_connect_refused", "ttl_expired"). Empty when
+	// there is nothing to explain. It lets a remote viewer tell "cannot see"
+	// from "failed, and why" without asking the node (SVI contract §12.12).
+	StatusReason string               `json:"status_reason,omitempty"`
+	ExpiresAt    time.Time            `json:"expires_at"`
+	Endpoints    []EndpointDescriptor `json:"endpoints"`
 }
 
 type HandleRequest struct {

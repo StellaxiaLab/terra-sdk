@@ -18,6 +18,10 @@ var (
 	ErrInvalidSchemaRef = errors.New("invalid SVI schema reference")
 )
 
+// MaxStatusReasonLength bounds ResourceDescriptor.StatusReason: a reason code,
+// not a log line.
+const MaxStatusReasonLength = 256
+
 var kindPattern = regexp.MustCompile(`^[a-z0-9]+(?:[.-][a-z0-9]+)*$`)
 
 func ValidateResource(resource ResourceDescriptor) error {
@@ -32,6 +36,9 @@ func ValidateResource(resource ResourceDescriptor) error {
 	}
 	if !validResourceStatus(resource.Status) {
 		return fmt.Errorf("%w: invalid status %q", ErrInvalidResource, resource.Status)
+	}
+	if len(resource.StatusReason) > MaxStatusReasonLength {
+		return fmt.Errorf("%w: status_reason is longer than %d bytes", ErrInvalidResource, MaxStatusReasonLength)
 	}
 	if resource.ExpiresAt.IsZero() {
 		return fmt.Errorf("%w: expires_at is required", ErrInvalidResource)

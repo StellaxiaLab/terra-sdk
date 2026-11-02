@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -57,5 +58,19 @@ func loadFixture(t *testing.T, group, name string, target any) {
 	}
 	if err := json.Unmarshal(raw, target); err != nil {
 		t.Fatalf("decode fixture: %v", err)
+	}
+}
+
+func TestStatusReasonIsBounded(t *testing.T) {
+	var resource ResourceDescriptor
+	loadFixture(t, "valid", "resource-descriptor.json", &resource)
+	resource.Status = ResourceUnavailable
+	resource.StatusReason = "module_stopped"
+	if err := ValidateResource(resource); err != nil {
+		t.Fatalf("a reason code was refused: %v", err)
+	}
+	resource.StatusReason = strings.Repeat("x", MaxStatusReasonLength+1)
+	if err := ValidateResource(resource); err == nil {
+		t.Fatal("an oversized status_reason was accepted")
 	}
 }

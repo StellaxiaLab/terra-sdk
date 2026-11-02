@@ -633,10 +633,9 @@ func (f *Framework) Resources(context.Context) ([]coresvi.ResourceDescriptor, er
 			status = coresvi.ResourceAvailable
 		}
 		labels := map[string]string{"resourcizer.type": i.spec.Type, "resourcizer.instance": name}
-		if i.reason != "" {
-			labels["status_reason"] = i.reason
-		} else if i.state == modulert.InstanceStarting {
-			labels["status_reason"] = "instance_starting"
+		reason := i.reason
+		if reason == "" && i.state == modulert.InstanceStarting {
+			reason = "instance_starting"
 		}
 		var endpoints []coresvi.EndpointDescriptor
 		for _, endpoint := range i.endpointsNow() {
@@ -662,7 +661,7 @@ func (f *Framework) Resources(context.Context) ([]coresvi.ResourceDescriptor, er
 			ResourceID: i.spec.Type + "." + name, NodeID: "local", Kind: i.entry.kind(),
 			CanonicalName: "resourcizer/" + i.spec.Type + "/" + name, DisplayName: name,
 			ProviderID: "module." + f.moduleID, Owner: coresvi.SubjectRef{Type: coresvi.SubjectNode, ID: "local"},
-			Labels: labels, Status: status, ExpiresAt: expires, Endpoints: endpoints,
+			Labels: labels, Status: status, StatusReason: reason, ExpiresAt: expires, Endpoints: endpoints,
 		})
 	}
 	return resources, nil
