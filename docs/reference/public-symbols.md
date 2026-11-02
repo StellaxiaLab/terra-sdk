@@ -44,6 +44,7 @@ v0.1.0 준비 시점(`go doc` 기준 내보낸 식별자)의 목록이다. 시�
 - 타입: `ResourceDescriptor`, `EndpointDescriptor`, `EndpointReference`, `RuntimeStatus`, `HandleRequest`, `SubjectRef`, `BindingDeclaration`, `BindingDesiredState`, `CompatibilityPolicy`, `Direction`, `Interaction`, `Operation`, `QoSProfile`, `ResourceStatus`, `RuntimeKind`, `RuntimeState`, `SubjectType`
 - 상수 55개: 위 열거형의 값(`Direction*`, `Interaction*`, `Operation*`, `QoS*`, `Resource*`, `Runtime*`, `Subject*`, `CompatibilityPolicy*`, `BindingDesired*`)
 - 검증(v0.2.0에서 추가): `ValidateResource`, `ValidateEndpoint`, `ParseSchemaRef`, 타입 `SchemaRef`, 오류 `ErrInvalidResource`, `ErrInvalidEndpoint`, `ErrInvalidSchemaRef`
+- 상태 사유(v0.7.0): 필드 `ResourceDescriptor.StatusReason`(`status_reason`, 선택), 상수 `MaxStatusReasonLength`
 - 설정 스키마(자원화 틀): `CheckConfigSchema`, `MaxConfigSchemaBytes`, `ValidateConfig`, 타입 `ConfigError`, `SecretPaths`, `RedactConfig`
 
 ## `protocol` — 입력 타입

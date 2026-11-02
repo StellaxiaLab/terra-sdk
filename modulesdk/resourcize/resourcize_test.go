@@ -286,7 +286,7 @@ func TestFailedInstanceIsUnavailableEverywhere(t *testing.T) {
 		t.Fatalf("resources = %v %v", resources, err)
 	}
 	resource := resources[0]
-	if resource.Status != coresvi.ResourceUnavailable || resource.Labels["status_reason"] != "probe_refused" || resource.ResourceID != "sample.recorder.cam" {
+	if resource.Status != coresvi.ResourceUnavailable || resource.StatusReason != "probe_refused" || resource.ResourceID != "sample.recorder.cam" {
 		t.Fatalf("descriptor = %+v", resource)
 	}
 	if err := coresvi.ValidateResource(resource); err != nil {
