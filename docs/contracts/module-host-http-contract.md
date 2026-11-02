@@ -144,6 +144,9 @@ handshake가 성공한 뒤 부른다. 매니페스트의 `readiness.timeoutMs`(�
 | 경로 | 방향 | 언제 |
 | --- | --- | --- |
 | `GET /terra/svi/resources` | 호스트 → 모듈 | `contributions.svi.resources`를 선언했을 때. 노드 카탈로그로 정규화될 자원 서술자 배열을 답한다 |
+| `GET /terra/svi/resourcizers` | 호스트 → 모듈 | `contributions.svi.resourcizers`를 선언했을 때. 모듈이 **자원으로 만들 수 있는 유형** 목록 `{etag, types[]}`. 유형마다 `id`·`title`·`configSchema`(그릴 수 있는 JSON Schema 부분집합, `svi.CheckConfigSchema`)·`endpoints`·`accepts`. 모듈이 목록을 소유하고 호스트는 읽기만 한다 |
+| `PUT /terra/svi/instances` | 호스트 → 모듈 | 위와 같이. 노드가 이 모듈에 선언한 인스턴스 **전체 집합** `{instances:[{name,type,config}]}`. 수준 기반 — 같은 집합 두 번은 아무것도 바꾸지 않고, 빠진 인스턴스의 열린 sink는 `resource_withdrawn`, 바뀐 것은 `resource_replaced`로 닫는다. 답은 인스턴스마다 `{name,type,state: starting\|ready\|failed, reason, resources, updatedAt}`. 모듈은 선언을 저장하지 않는다(노드가 모듈 시작 뒤마다 다시 건넨다). 실현된 자원은 `/terra/svi/resources`에 접미사 `<type>.<name>`으로 실린다 |
+| `POST /terra/svi/instances/validate` | 호스트 → 모듈 | 위와 같이. 인스턴스 하나를 만들지 않고 검사한다. 200 · 422 `{errors:[{path,message}]}`(`path`는 config 안 JSON Pointer) · 404(모르는 유형) |
 | `POST /terra/svi/sink` | 호스트 → 모듈 | `contributions.svi.sink`를 선언했을 때. binding의 목적지가 된다. 본문의 `op`가 `open`(자원·endpoint에 sink를 열고 `sinkId`를 답한다. 자기 것이 아니면 404)·`write`(순서대로 한 프레임)·`close`(연 sink마다 정확히 한 번) 중 하나다. 거절 사유는 `detail`에 싣는다 |
 | `POST /terra/core/invoke` | **모듈 → 호스트** | 모듈이 Core capability를 부를 때. 주소는 `TERRA_MODULE_HOST_ENDPOINT`, 자격은 같은 것. 브로커가 `permissions.coreOperations` 선언을 게이트한다 |
 | 모듈 자신의 Operation 경로 | Gateway → 모듈 | 계약의 `bindings`가 적은 method·path 그대로. **다르면 404다** — 게시된 route는 맞는데 답이 없는 상태가 된다 |
