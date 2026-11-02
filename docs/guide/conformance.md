@@ -44,6 +44,7 @@ Terra 코드를 import하지 않는다. 계약(환경변수 6 · 헤더 1 · 경
 | `CheckOptions.Resourcizer` | 인스턴스 집합에 인스턴스마다 상태 하나(순서대로), **같은 집합 두 번은 상태와 그 시각을 바꾸지 않는다**, 표본이 유효한 `available` 자원이 된다, 잘린 집합은 400이고 아무것도 바꾸지 않는다 | pass/fail |
 | `CheckOptions.Resourcizer` | validate: 표본 200, 잘못된 값 422 + JSON Pointer 경로, 모르는 유형 404. `x-terra-secret` 값이 어느 응답에도 나오지 않는다 | pass/fail |
 | `CheckOptions.Resourcizer` | sink(표본에 sink endpoint가 있을 때): 남의 자원·없는 endpoint 404, open/write/close, **close 두 번 모두 200**, close 뒤 write 404, 인스턴스를 빼면 열린 sink가 끝나고(`resource_withdrawn`) 다시 열면 404 | pass/fail, 없으면 skip |
+| `CheckOptions.Resourcizer` | source(표본에 source endpoint가 있을 때): 남의 자원 404, open이 `schemaRef`를 답함, 5초 안에 프레임 또는 끝, close 두 번 모두 200, close 뒤 next 404, 인스턴스를 빼면 열린 source가 사유(`resource_withdrawn`)로 끝나고 **완료(`done`)로 답하지 않음** | pass/fail, 없으면 skip |
 | `-core-invoke` | `/terra/core/invoke` | **skip** - 모듈에서 호스트로 가는 방향이라 호스트가 서빙한다. 키트는 브로커를 흉내 내지 않는다 |
 
 ## 결과 수준과 JSON

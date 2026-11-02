@@ -170,7 +170,8 @@ func TestKitOptionalPathsAndVersionMatchTheSDK(t *testing.T) {
 		conformance.CoreInvokePath != modulert.CoreInvokePath ||
 		conformance.SVIResourcizersPath != modulert.SVIResourcizersPath ||
 		conformance.SVIInstancesPath != modulert.SVIInstancesPath ||
-		conformance.SVIInstancesValidatePath != modulert.SVIInstancesValidatePath {
+		conformance.SVIInstancesValidatePath != modulert.SVIInstancesValidatePath ||
+		conformance.SVISourcePath != modulert.SVISourcePath {
 		t.Error("optional path literals drifted from modulert")
 	}
 	if conformance.WireContractVersion != compat.ContractVersion {
