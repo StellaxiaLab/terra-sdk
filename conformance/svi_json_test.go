@@ -167,7 +167,10 @@ func TestJSONReportShape(t *testing.T) {
 func TestKitOptionalPathsAndVersionMatchTheSDK(t *testing.T) {
 	if conformance.SVIResourcesPath != modulert.SVIResourcesPath ||
 		conformance.SVISinkPath != modulert.SVISinkPath ||
-		conformance.CoreInvokePath != modulert.CoreInvokePath {
+		conformance.CoreInvokePath != modulert.CoreInvokePath ||
+		conformance.SVIResourcizersPath != modulert.SVIResourcizersPath ||
+		conformance.SVIInstancesPath != modulert.SVIInstancesPath ||
+		conformance.SVIInstancesValidatePath != modulert.SVIInstancesValidatePath {
 		t.Error("optional path literals drifted from modulert")
 	}
 	if conformance.WireContractVersion != compat.ContractVersion {

@@ -112,6 +112,9 @@ type CheckOptions struct {
 	// /terra/svi/sink). Enable it only for a module whose manifest declares
 	// contributions.svi.
 	SVI bool
+	// Resourcizer checks the resourcizer seam (/terra/svi/resourcizers,
+	// /terra/svi/instances) with the samples it names. nil skips those rules.
+	Resourcizer *ResourcizerPlan
 	// CoreInvoke reports the /terra/core/invoke rule. That path is served by
 	// the host, not the module, so the kit can only record it as skipped.
 	CoreInvoke bool
@@ -146,6 +149,9 @@ func Check(ctx context.Context, id Identity, opts CheckOptions) Report {
 	}
 	if opts.SVI {
 		c.checkSVI(&report)
+	}
+	if opts.Resourcizer != nil {
+		c.checkResourcizer(&report, *opts.Resourcizer)
 	}
 	if opts.CoreInvoke {
 		report.addSkip("core invoke: "+CoreInvokePath, "module-to-host direction: the host serves this path, and the kit does not play a capability broker")

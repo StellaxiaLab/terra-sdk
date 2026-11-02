@@ -36,8 +36,8 @@ type ReadinessFunc func(context.Context) (ready bool, detail string)
 //
 // The module describes resources in module-local terms — node identity belongs
 // to the daemon, which stamps NodeID and namespaces ResourceID on ingestion.
-// A module therefore leaves ResourceID/NodeID empty and identifies each
-// resource by CanonicalName (e.g. "io/camera/camera-default").
+// ResourceID carries the module-local suffix (e.g. "camera.front-door"); the
+// daemon refuses an empty one and turns it into svi.<node>.<suffix>.
 type SVIResourcesFunc func(context.Context) ([]coresvi.ResourceDescriptor, error)
 
 // Config configures a hosted module server.
@@ -63,6 +63,12 @@ type Config struct {
 	// describing a resource and absorbing bytes for it are different powers,
 	// and the manifest declares them separately (contributions.svi.sink).
 	SVISink SVISinkFunc
+	// SVIResourcizer, when set, serves the resourcizer seam: the types this
+	// module turns into resources (modulert.SVIResourcizersPath) and the
+	// instances the node declared for it (modulert.SVIInstancesPath). Package
+	// modulesdk/resourcize implements it, together with SVIResources and
+	// SVISink, from a type's schema and Open functions. Optional.
+	SVIResourcizer SVIResourcizer
 	// WindowOrigin is the UI origin of this module's window-mode GUI app
 	// (창 모드 앱 런처 설계 §5.1), e.g. "http://127.0.0.1:<port>" of a listener
 	// the module opened itself BEFORE calling Listen. Reported in the identity
@@ -133,6 +139,11 @@ func routes(cfg Config) http.Handler {
 	}
 	if cfg.SVISink != nil {
 		mux.Handle(modulert.SVISinkPath, guard(cfg.Identity.Credential, sviSinkHandler(cfg, newSinkRegistry())))
+	}
+	if cfg.SVIResourcizer != nil {
+		mux.Handle(modulert.SVIResourcizersPath, guard(cfg.Identity.Credential, sviResourcizersHandler(cfg.SVIResourcizer)))
+		mux.Handle(modulert.SVIInstancesPath, guard(cfg.Identity.Credential, sviInstancesHandler(cfg.SVIResourcizer)))
+		mux.Handle(modulert.SVIInstancesValidatePath, guard(cfg.Identity.Credential, sviInstanceValidateHandler(cfg.SVIResourcizer)))
 	}
 	if cfg.Operations != nil {
 		mux.Handle("/", guard(cfg.Identity.Credential, cfg.Operations))

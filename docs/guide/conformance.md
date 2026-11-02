@@ -40,6 +40,10 @@ Terra 코드를 import하지 않는다. 계약(환경변수 6 · 헤더 1 · 경
 | `-svi` | `/terra/svi/resources`·`/terra/svi/sink`가 자격 없이/틀린 자격으로 401 | pass/fail |
 | `-svi` | `/terra/svi/resources`가 200과 유효한 자원 서술자 배열(`svi.ValidateResource`)로 답한다 | pass/fail |
 | `-svi` | sink의 `open`/`write`/`close` 본문 | **skip** - 계약이 본문 모양을 검사할 만큼 정하지 않았다 |
+| `CheckOptions.Resourcizer` (Go만) | 자원화 seam 세 경로가 자격 없이 401, 유형 목록 etag가 있고 안정, 스키마가 부분집합 | pass/fail |
+| `CheckOptions.Resourcizer` | 인스턴스 집합에 인스턴스마다 상태 하나(순서대로), **같은 집합 두 번은 상태와 그 시각을 바꾸지 않는다**, 표본이 유효한 `available` 자원이 된다, 잘린 집합은 400이고 아무것도 바꾸지 않는다 | pass/fail |
+| `CheckOptions.Resourcizer` | validate: 표본 200, 잘못된 값 422 + JSON Pointer 경로, 모르는 유형 404. `x-terra-secret` 값이 어느 응답에도 나오지 않는다 | pass/fail |
+| `CheckOptions.Resourcizer` | sink(표본에 sink endpoint가 있을 때): 남의 자원·없는 endpoint 404, open/write/close, **close 두 번 모두 200**, close 뒤 write 404, 인스턴스를 빼면 열린 sink가 끝나고(`resource_withdrawn`) 다시 열면 404 | pass/fail, 없으면 skip |
 | `-core-invoke` | `/terra/core/invoke` | **skip** - 모듈에서 호스트로 가는 방향이라 호스트가 서빙한다. 키트는 브로커를 흉내 내지 않는다 |
 
 ## 결과 수준과 JSON
