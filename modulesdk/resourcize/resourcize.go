@@ -97,8 +97,9 @@ type StreamSink interface {
 	Close(reason string) error
 }
 
-// StreamSource produces frames for an instance endpoint. It is the shape the
-// source seam will take (design §7); the framework does not serve it yet.
+// StreamSource produces frames for an instance endpoint (the source seam,
+// design §7). Next returns the next frame, io.EOF when the stream ended on its
+// own, or the failure. Close must unblock a Next in flight.
 type StreamSource interface {
 	Next(ctx context.Context) ([]byte, error)
 	Close(reason string) error
@@ -128,6 +129,10 @@ type Declared[C any] struct {
 	Release func(instance Instance[C])
 	// OpenSink opens a sink on one of the instance's sink endpoints.
 	OpenSink func(ctx context.Context, instance Instance[C], endpointID string) (StreamSink, error)
+	// OpenSource opens a source on one of the instance's source endpoints.
+	// A type without it publishes sources nobody can bind from, so Register
+	// refuses that.
+	OpenSource func(ctx context.Context, instance Instance[C], endpointID string) (StreamSource, error)
 }
 
 // FieldErrors points at bad config values; return it from Validate.
@@ -177,6 +182,7 @@ type entry interface {
 	realize(ctx context.Context, name string, config any) error
 	release(name string, config any)
 	openSink(ctx context.Context, name string, config any, endpointID string) (StreamSink, error)
+	openSource(ctx context.Context, name string, config any, endpointID string) (StreamSource, error)
 	maxInstances() int
 }
 
@@ -249,6 +255,13 @@ func (e declared[C]) openSink(ctx context.Context, name string, config any, endp
 	return e.d.OpenSink(ctx, e.instance(name, config), endpointID)
 }
 
+func (e declared[C]) openSource(ctx context.Context, name string, config any, endpointID string) (StreamSource, error) {
+	if e.d.OpenSource == nil {
+		return nil, modulesdk.ErrSVISourceNotServed
+	}
+	return e.d.OpenSource(ctx, e.instance(name, config), endpointID)
+}
+
 func operationsOf(endpoint Endpoint) []string {
 	if len(endpoint.Operations) > 0 {
 		return endpoint.Operations
@@ -282,7 +295,7 @@ type instance struct {
 	reason    string
 	updatedAt time.Time
 	cancel    context.CancelFunc
-	streams   map[*trackedSink]struct{}
+	streams   map[ender]struct{}
 }
 
 // New starts an empty framework for the module.
@@ -330,6 +343,9 @@ func Register[C any](f *Framework, d Declared[C]) error {
 		if endpoint.Direction == Sink && d.OpenSink == nil {
 			return fmt.Errorf("resourcize: type %s has sink endpoint %s but no OpenSink", d.ID, endpoint.ID)
 		}
+		if endpoint.Direction == Source && d.OpenSource == nil {
+			return fmt.Errorf("resourcize: type %s has source endpoint %s but no OpenSource", d.ID, endpoint.ID)
+		}
 		for field := range endpoint.When {
 			if _, ok := properties[field]; !ok {
 				return fmt.Errorf("resourcize: type %s endpoint %s: when names %q, which is not a config field", d.ID, endpoint.ID, field)
@@ -361,12 +377,13 @@ func roundTrip(schema map[string]any) map[string]any {
 // resources or sink is refused — two owners of one seam would each tombstone
 // the other's resources.
 func (f *Framework) Install(cfg *modulesdk.Config) error {
-	if cfg.SVIResourcizer != nil || cfg.SVIResources != nil || cfg.SVISink != nil {
-		return errors.New("resourcize: the config already serves SVI resources, sink or resourcizers")
+	if cfg.SVIResourcizer != nil || cfg.SVIResources != nil || cfg.SVISink != nil || cfg.SVISource != nil {
+		return errors.New("resourcize: the config already serves SVI resources, sink, source or resourcizers")
 	}
 	cfg.SVIResourcizer = f
 	cfg.SVIResources = f.Resources
 	cfg.SVISink = f.OpenSink
+	cfg.SVISource = f.OpenSource
 	return nil
 }
 
@@ -504,7 +521,7 @@ func (f *Framework) ApplyInstances(ctx context.Context, set modulert.InstanceSet
 			continue
 		}
 		fresh := &instance{spec: item.spec, canonical: canonical, entry: item.entry, config: item.config,
-			values: configValues(item.spec.Config), updatedAt: now, streams: map[*trackedSink]struct{}{}}
+			values: configValues(item.spec.Config), updatedAt: now, streams: map[ender]struct{}{}}
 		switch {
 		case item.reason != "":
 			fresh.state, fresh.reason = modulert.InstanceFailed, item.reason
@@ -553,7 +570,7 @@ func (i *instance) end(reason string) {
 	for stream := range i.streams {
 		stream.forceClose(reason)
 	}
-	i.streams = map[*trackedSink]struct{}{}
+	i.streams = map[ender]struct{}{}
 	if i.config != nil && i.entry != nil {
 		go i.entry.release(i.spec.Name, i.config)
 	}
@@ -732,6 +749,119 @@ func (f *Framework) OpenSink(ctx context.Context, resourceID, endpointID string)
 	i.streams[tracked] = struct{}{}
 	tracked.framework = f
 	return tracked, nil
+}
+
+// ender is an open stream the framework can end when its instance goes away.
+type ender interface{ forceClose(reason string) }
+
+// OpenSource is the source seam, judged like the sink: 404
+// (ErrSVISourceNotServed) for an endpoint this module does not have, 503 with
+// the reason while the instance is not ready.
+func (f *Framework) OpenSource(ctx context.Context, resourceID, endpointID string) (modulesdk.SVISourceOpened, error) {
+	f.mu.Lock()
+	i := f.lookup(resourceID)
+	if i == nil {
+		f.mu.Unlock()
+		return modulesdk.SVISourceOpened{}, modulesdk.ErrSVISourceNotServed
+	}
+	var served *Endpoint
+	for _, endpoint := range i.endpointsNow() {
+		if endpoint.ID == endpointID && endpoint.Direction == Source {
+			copied := endpoint
+			served = &copied
+		}
+	}
+	if served == nil {
+		f.mu.Unlock()
+		return modulesdk.SVISourceOpened{}, modulesdk.ErrSVISourceNotServed
+	}
+	if i.state != modulert.InstanceReady {
+		reason := i.reason
+		if reason == "" {
+			reason = "instance_starting"
+		}
+		f.mu.Unlock()
+		return modulesdk.SVISourceOpened{}, errors.New(reason)
+	}
+	name, config, e := i.spec.Name, i.config, i.entry
+	f.mu.Unlock()
+
+	source, err := e.openSource(ctx, name, config, endpointID)
+	if err != nil {
+		if errors.Is(err, modulesdk.ErrSVISourceNotServed) {
+			return modulesdk.SVISourceOpened{}, err
+		}
+		return modulesdk.SVISourceOpened{}, errors.New(reasonOf(err))
+	}
+	tracked := &trackedSource{inner: source}
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	if f.instances[name] != i {
+		_ = source.Close(ReasonWithdrawn)
+		return modulesdk.SVISourceOpened{}, errors.New(ReasonWithdrawn)
+	}
+	tracked.owner, tracked.framework = i, f
+	i.streams[tracked] = struct{}{}
+	opened := modulesdk.SVISourceOpened{Source: tracked, SchemaRef: served.Schema}
+	if len(served.Encodings) > 0 {
+		opened.Encoding = served.Encodings[0]
+	}
+	return opened, nil
+}
+
+// trackedSource is a source the framework can end. After the instance goes
+// away its Next answers the reason (resource_withdrawn), never end of stream:
+// a withdrawn resource did not complete.
+type trackedSource struct {
+	inner     StreamSource
+	framework *Framework
+	owner     *instance
+
+	mu     sync.Mutex
+	closed string
+}
+
+func (s *trackedSource) Next(ctx context.Context) ([]byte, error) {
+	s.mu.Lock()
+	closed := s.closed
+	s.mu.Unlock()
+	if closed != "" {
+		return nil, errors.New(closed)
+	}
+	frame, err := s.inner.Next(ctx)
+	s.mu.Lock()
+	closed = s.closed
+	s.mu.Unlock()
+	if closed != "" {
+		return nil, errors.New(closed)
+	}
+	return frame, err
+}
+
+// Close is the daemon's close: once, and success after.
+func (s *trackedSource) Close() error {
+	err := s.closeWith("closed")
+	if s.framework != nil {
+		s.framework.mu.Lock()
+		delete(s.owner.streams, s)
+		s.framework.mu.Unlock()
+	}
+	return err
+}
+
+func (s *trackedSource) forceClose(reason string) { _ = s.closeWith(reason) }
+
+func (s *trackedSource) closeWith(reason string) error {
+	s.mu.Lock()
+	if s.closed != "" {
+		s.mu.Unlock()
+		return nil
+	}
+	s.closed = reason
+	s.mu.Unlock()
+	// Outside the lock: Close unblocks a Next in flight, which then reads
+	// closed under the lock.
+	return s.inner.Close(reason)
 }
 
 // trackedSink is a sink the framework can end. Its inner Close runs once,

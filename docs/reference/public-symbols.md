@@ -22,19 +22,20 @@ v0.1.0 준비 시점(`go doc` 기준 내보낸 식별자)의 목록이다. 시�
 - 상수: `ConfigFileEnv`, `DataDirEnv`
 - 오류: `ErrConfigNotProvided`, `ErrCoreUnavailable`, `ErrSVISinkNotServed`
 - 추가(자원화 틀): 타입 `SVIResourcizer`, 필드 `Config.SVIResourcizer`
+- 추가(source seam, v0.8.0): 타입 `SVISource`, `SVISourceOpened`, `SVISourceFunc`, 필드 `Config.SVISource`, 오류 `ErrSVISourceNotServed`
 
 ## `modulesdk/resourcize` — 자원화 틀 (유형·인스턴스·sink 수명)
 
 - 타입: `Framework`, `Declared`, `Instance`, `Endpoint`, `StreamSink`, `StreamSource`(source seam 모양만, 아직 서빙 안 함), `FieldErrors`
-- 함수/메서드: `New`, `Register`, `Field`, `Unavailable`, `Framework.Install`, `Framework.Resourcizers`, `Framework.ApplyInstances`, `Framework.ValidateInstance`, `Framework.Instances`, `Framework.Resources`, `Framework.OpenSink`
+- 함수/메서드: `New`, `Register`, `Field`, `Unavailable`, `Framework.Install`, `Framework.OpenSource`, `Framework.Resourcizers`, `Framework.ApplyInstances`, `Framework.ValidateInstance`, `Framework.Instances`, `Framework.Resources`, `Framework.OpenSink`
 - 상수: `Source`, `Sink`, `ReasonWithdrawn`, `ReasonReplaced`
 
 ## `modulert` — 호스트↔모듈 와이어 계약 (타입·상수·오류)
 
-- 타입: `WorkloadIdentity`, `IdentityIssuer`, `HandshakeResponse`, `HandshakeResult`, `ReadinessResponse`, `Readiness`, `CoreInvocation`, `CoreResult`, `SVISinkOp`, `SVISinkRequest`, `SVISinkResponse`, `ResourcizerList`, `ResourcizerType`, `ResourcizerEndpoint`, `ResourcizerAccept`, `InstanceSpec`, `InstanceSet`, `InstanceStatus`, `InstanceSetResult`, `FieldError`, `InstanceValidateResponse`, `GatewayDelegateInput`, `GatewayDelegateOutput`, `SharedRoot`, `State`
+- 타입: `WorkloadIdentity`, `IdentityIssuer`, `HandshakeResponse`, `HandshakeResult`, `ReadinessResponse`, `Readiness`, `CoreInvocation`, `CoreResult`, `SVISinkOp`, `SVISinkRequest`, `SVISinkResponse`, `SVISourceOp`, `SVISourceRequest`, `SVISourceResponse`, `ResourcizerList`, `ResourcizerType`, `ResourcizerEndpoint`, `ResourcizerAccept`, `InstanceSpec`, `InstanceSet`, `InstanceStatus`, `InstanceSetResult`, `FieldError`, `InstanceValidateResponse`, `GatewayDelegateInput`, `GatewayDelegateOutput`, `SharedRoot`, `State`
 - 함수/메서드: `IdentityFromEnv`, `WorkloadIdentity.Env`, `NewIdentityIssuer`, `IdentityIssuer.Issue`, `AllocateLoopbackEndpoint`, `Activate`, `NextActivationState`, `CanTransition`, `KnownState`, `IsTerminalStable`, `NextStates`, `ModuleDataDir`, `NameSharedRoots`, `PositionalSharedRootName`, `SharedRootPaths`, `SharedRoot.MarshalJSON`, `SharedRoot.UnmarshalJSON`
 - 환경변수 이름: `EnvModuleID`, `EnvInstanceID`, `EnvEpoch`, `EnvNonce`, `EnvCredential`, `EnvEndpoint`, `EnvHostEndpoint`, `ConfigFileEnv`, `SharedRootsEnv`
-- 경로·헤더: `HandshakePath`, `ReadinessPath`, `SVIResourcesPath`, `SVISinkPath`, `SVIResourcizersPath`, `SVIInstancesPath`, `SVIInstancesValidatePath`, `CoreInvokePath`, `CredentialHeader`, `TraceIDHeader`
+- 경로·헤더: `HandshakePath`, `ReadinessPath`, `SVIResourcesPath`, `SVISinkPath`, `SVIResourcizersPath`, `SVIInstancesPath`, `SVIInstancesValidatePath`, `SVISourcePath`, `CoreInvokePath`, `CredentialHeader`, `TraceIDHeader`
 - 위임 도어: `GatewayDelegateOperationID`, `GatewayDelegateOperationVersion`, `DelegatedCredentialPrefix`
 - 그 밖의 상수: `LoopbackHost`, `DataDirName`, `SharedRootsPermission`, `SVISinkOpOpen`, `SVISinkOpWrite`, `SVISinkOpClose`, `State*` 9개(`StateDiscovered` … `StateStopped`)
 - 오류: `ErrCoreOperationDenied`
@@ -80,7 +81,7 @@ Terra ID 토큰·키 묶음, `.terra` 이름·이름 레코드, 접속 서비스
 - 타입: `Spec`, `CheckOptions`, `Identity`, `Report`, `Result`
 - 함수: `Run`, `Check`, `NewIdentity`, `Identity.Env`, `Report.OK`, `Report.String`, `conformancetest.Run`
 - 추가(마켓 연동): 타입 `Status`, `JSONReport`, `JSONResult`; `Result.Level`, `Report.ToJSON`, `Report.MarshalJSON`, `Report.Counts`, `Report.Summary`; 필드 `Spec.SVI`·`Spec.CoreInvoke`·`CheckOptions.SVI`·`CheckOptions.CoreInvoke`; `Result.Status`·`Result.Rule`
-- 추가(자원화 틀): 타입 `ResourcizerPlan`, `InstanceSample`, 필드 `CheckOptions.Resourcizer`, 상수 `SVIResourcizersPath`·`SVIInstancesPath`·`SVIInstancesValidatePath`
+- 추가(자원화 틀): 타입 `ResourcizerPlan`, `InstanceSample`, 필드 `CheckOptions.Resourcizer`, 상수 `SVIResourcizersPath`·`SVIInstancesPath`·`SVIInstancesValidatePath`·`SVISourcePath`
 - 상수: 계약 리터럴 9개(`Env*` 6, `CredentialHeader`, `HandshakePath`, `ReadinessPath`), 선택 경로 `SVIResourcesPath`·`SVISinkPath`·`CoreInvokePath`, `WireContractVersion`, `ReportSchemaVersion`, 수준 `StatusPass`·`StatusFail`·`StatusWarn`·`StatusSkip`
 - 명령: `terra-conformance`
 

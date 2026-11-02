@@ -121,6 +121,12 @@ func (c checker) checkResourcizer(report *Report, plan ResourcizerPlan) {
 	} else {
 		report.addSkip("sink rules", "no sample instance has a sink endpoint")
 	}
+	if sample, endpoint, ok := c.sourceSample(plan); ok {
+		report.add("source: not mine is 404, open/next/close, close twice succeeds", c.sourceLifecycle(sample, endpoint))
+		report.add("source: withdrawing the instance ends its open source with the reason", c.sourceWithdrawn(plan, sample, endpoint))
+	} else {
+		report.addSkip("source rules", "no sample instance has a source endpoint")
+	}
 	_, _ = c.applyInstances(nil)
 }
 

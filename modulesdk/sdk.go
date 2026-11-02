@@ -63,6 +63,11 @@ type Config struct {
 	// describing a resource and absorbing bytes for it are different powers,
 	// and the manifest declares them separately (contributions.svi.sink).
 	SVISink SVISinkFunc
+	// SVISource, when set, makes this module a possible ORIGIN of an SVI
+	// binding: the daemon opens a source at modulert.SVISourcePath and pulls
+	// frames from it. Separate from SVISink, and declared separately in the
+	// manifest (contributions.svi.source).
+	SVISource SVISourceFunc
 	// SVIResourcizer, when set, serves the resourcizer seam: the types this
 	// module turns into resources (modulert.SVIResourcizersPath) and the
 	// instances the node declared for it (modulert.SVIInstancesPath). Package
@@ -139,6 +144,9 @@ func routes(cfg Config) http.Handler {
 	}
 	if cfg.SVISink != nil {
 		mux.Handle(modulert.SVISinkPath, guard(cfg.Identity.Credential, sviSinkHandler(cfg, newSinkRegistry())))
+	}
+	if cfg.SVISource != nil {
+		mux.Handle(modulert.SVISourcePath, guard(cfg.Identity.Credential, sviSourceHandler(cfg, newSourceRegistry())))
 	}
 	if cfg.SVIResourcizer != nil {
 		mux.Handle(modulert.SVIResourcizersPath, guard(cfg.Identity.Credential, sviResourcizersHandler(cfg.SVIResourcizer)))
