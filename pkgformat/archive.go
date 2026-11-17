@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 	"time"
 )
 
@@ -87,6 +88,11 @@ func WritePackage(root string, manifestRaw []byte, dest string) (err error) {
 		return err
 	}
 
+	// A package built on Windows has no exec bit to record (every file reads
+	// 0666), and a Linux host refuses to start a non-executable entrypoint.
+	// Entrypoints and everything under bin/ are therefore written 0755; the
+	// rest 0644 (0755 only when the source already had an exec bit).
+	executable := executablePaths(manifestRaw)
 	for _, relative := range payloadPaths {
 		source := filepath.Join(root, filepath.FromSlash(relative))
 		info, err := os.Stat(source)
@@ -94,7 +100,11 @@ func WritePackage(root string, manifestRaw []byte, dest string) (err error) {
 			return err
 		}
 		header := &zip.FileHeader{Name: relative, Method: zip.Deflate, Modified: epoch}
-		header.SetMode(info.Mode().Perm())
+		if executable[relative] || strings.HasPrefix(relative, "bin/") || info.Mode().Perm()&0o111 != 0 {
+			header.SetMode(0o755)
+		} else {
+			header.SetMode(0o644)
+		}
 		entry, err := writer.CreateHeader(header)
 		if err != nil {
 			return err
@@ -312,6 +322,7 @@ func ExtractPackage(packagePath, dest string, limits ArchiveLimits) error {
 
 	var totalWritten int64
 	seen := map[string]bool{}
+	var executable map[string]bool
 	for _, entry := range reader.File {
 		name := entry.Name
 		if name != ManifestFileName {
@@ -338,6 +349,17 @@ func ExtractPackage(packagePath, dest string, limits ArchiveLimits) error {
 		perm := mode.Perm()
 		if perm == 0 {
 			perm = 0o644
+		}
+		if name == ManifestFileName {
+			if opened, err := entry.Open(); err == nil {
+				raw, _ := io.ReadAll(io.LimitReader(opened, limits.MaxManifestBytes+1))
+				opened.Close()
+				executable = executablePaths(raw)
+			}
+		} else if executable[name] {
+			// Packs made on Windows carry 0666 for every file; the manifest
+			// says which are entrypoints, and those must be startable.
+			perm |= 0o755
 		}
 		out, err := os.OpenFile(target, os.O_WRONLY|os.O_CREATE|os.O_EXCL, perm)
 		if err != nil {
@@ -420,4 +442,23 @@ func collectPackagePaths(root string) ([]string, error) {
 	}
 	sort.Strings(paths)
 	return paths, nil
+}
+
+// executablePaths lists the package-relative files a manifest declares as
+// something to execute (process, worker and runtime entrypoints). Unparseable
+// manifests yield an empty set — validation reports those elsewhere.
+func executablePaths(manifestRaw []byte) map[string]bool {
+	out := map[string]bool{}
+	manifest, _, err := DecodeManifest(manifestRaw)
+	if err != nil {
+		return out
+	}
+	for _, group := range []map[string]string{manifest.Entrypoints.Process, manifest.Entrypoints.Worker, manifest.Entrypoints.Runtime} {
+		for _, p := range group {
+			if p = strings.TrimSpace(p); p != "" {
+				out[p] = true
+			}
+		}
+	}
+	return out
 }
