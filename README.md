@@ -24,6 +24,7 @@ Terra 모듈이 호스트와 대화하는 약속을 구현한 얇은 공개 Go S
 | `github.com/StellaxiaLab/terra-sdk/modulesdk` | 모듈이 호스트에 붙는 도우미: `Listen/Serve`, `FromEnv`, `CoreClient`, `ModuleConfig`, `DataDir`, SVI sink |
 | `github.com/StellaxiaLab/terra-sdk/modulert` | 호스트↔모듈 와이어 계약: 환경변수 이름, 경로, 헤더, 신원·핸드셰이크·코어 호출 DTO, 위임 도어, 공유 루트 |
 | `github.com/StellaxiaLab/terra-sdk/svi` | SVI 데이터 타입과 서술자 검증(`ValidateResource` 등) |
+| `github.com/StellaxiaLab/terra-sdk/procguard` | 실행한 프로그램을 다루는 공용 코드: 승격 판정 `Elevated`, 종료 보장·CPU·메모리 상한 `Contain`(Windows Job Object, Linux cgroup v2), 부모 사망 신호 `Prepare`, 사용량 `Usage` |
 | `github.com/StellaxiaLab/terra-sdk/protocol` | 입력 이벤트·권한·가상 입력 타입 |
 | `github.com/StellaxiaLab/terra-sdk/trust` | **(v0.3.0, 불안정 v0.x)** 마켓·노드 공유 서명 형식: 작성자 서명·카운터서명·마켓 루트와 키 인증서·폐기 스냅숏과 그 검증기. 계약은 [market-trust](docs/contracts/market-trust.md) |
 | `github.com/StellaxiaLab/terra-sdk/pkgformat` | **(v0.3.0, 불안정 v0.x)** 모듈 패키지 형식: Manifest v2·v1, 설정 스키마, 정규 권한 문자열, `.tmod` 아카이브와 한도. 마켓과 노드가 같은 판정을 하려고 쓴다 |
